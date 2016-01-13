@@ -1,8 +1,4 @@
 
-;Why is Yellow propagating through the matrix?
-;Yellow should only be drawn if there is a match. 
-
-
  		section text
 
 

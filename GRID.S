@@ -114,7 +114,7 @@ rg1:		movem.l	d1-d2/a0-a2,-(sp)
 
 grid_update:
 		movem.l d0-d6/a0-a3,-(sp)
-		
+	
 		; don't do any updates while the match timer
 		; is counting down
 		move.l	grid_match_t,d0
@@ -134,11 +134,11 @@ grid_update:
 		movem.l	(sp)+,d0-d6/a0-a3
 		rts
 
-
 		; pre-processing before the main update
 		; for now this just clears existing flags
 		; later on it should allow for double
 		; buffering so logic can be run every frame
+
 
 gu_init:	lea	grid,a0
 		move.l	#grid_c-1,d0
@@ -363,7 +363,6 @@ dg1:
 		btst	#grid_match_bit,d4	; matched?
 		bne	dg_yellow
 		
-
 		and.b	#grid_type_mask,d4
 
 		cmp.b	#0,d4			; zero, so skip
