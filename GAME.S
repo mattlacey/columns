@@ -26,12 +26,10 @@ game_loop:	movem.l	d0-a6,-(sp)
 
 
 		moveq	#0,d0
-		move.l	#1,paused
 		move.b	joy2,d0			; keyboard joystick
 		btst	#0,d0
 		beq	check_reset
 		
-		move.l	#0,paused
 		
 ; reset
 check_reset:	btst	#1,d0
@@ -48,11 +46,6 @@ p1_input_done:
 		and.l	#1,d0
 		beq	game_loop_skip
 		
-		; if up cursor is not pressed, skip update
-		move.l	paused,d0
-		cmp	#1,d0
-		beq	game_loop_skip
-
 		jsr	clear_debug
 		jsr	grid_update
 		jsr	grid_matches
