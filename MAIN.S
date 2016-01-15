@@ -343,11 +343,6 @@ inits:
 demo_parts:
 		;dummy effect doing nothing 
 
-		; dc.l	1,dummy,dummy,chequer_map,2,1
-		; dc.l	14,dummy,dummy,draw_map,2,1 
-
-		; should not take this long!!
-		dc.l	30,dummy,dummy,game_prep,2,1
 		dc.l	0,dummy,dummy,game_loop,2,1
 
 		;exit demo
