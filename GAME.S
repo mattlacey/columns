@@ -8,9 +8,11 @@ game_init:	movem.l	d0-a6,-(sp)
 		move.l	#0,ticks		; clear ticks
 
 		jsr 	bg_init			; setup grid
-		moveq	#grid_h/2,d0
+		jsr	grid_init
+		
+		move.l	#8,d0
 		jsr	grid_random
-
+		
 		movem.l (sp)+,d0-a6
 		rts
 
@@ -35,8 +37,6 @@ game_loop:	movem.l	d0-a6,-(sp)
 check_reset:	btst	#1,d0
 		beq	p1_input_done
 		jsr	grid_init
-		moveq	#grid_h/2,d0
-		jsr	grid_random	
 		
 	
 p1_input_done:	

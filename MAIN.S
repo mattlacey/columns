@@ -268,6 +268,7 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include 'sprites.s'
 		include 'game.s'
 		include 'grid.s'
+		include 'util.s'
 
 		include 'data\ship.s'
 		

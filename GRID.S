@@ -42,7 +42,8 @@ grid_skip_bit:	equ	6
 
 grid_init:	movem.l	d0/a0,-(sp)
 		
-		move.l	#0,grid_match_t
+		move.l	#0,grid_timer
+		move.b	#255,grid_plr
 
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
@@ -90,11 +91,7 @@ grid_random:	; intialises d0 rows to random
 
 		lea	grid,a0
 
-rg1:		movem.l	d1-d2/a0-a2,-(sp)
-		move.w	#17,-(sp)		; 17 is rand
-		trap	#14			; call XBIOS
-		addq.l	#2,sp
-		movem.l	(sp)+,d1-d2/a0-a2
+rg1:		jsr	rand
 		and.l	#3,d0
 
 		move.b	d0,(a0)+
@@ -113,12 +110,17 @@ rg1:		movem.l	d1-d2/a0-a2,-(sp)
 
 
 
-grid_update:
-		movem.l d0-d6/a0-a3,-(sp)
-	
-		; don't do any updates while the match timer
+grid_update:	movem.l	d0-d6/a0-a3,-(sp)
+
+		; first update the player's index as needed
+		; based on inputs
+		
+gu_input:
+		
+		
+		; don't do any other updates while the timer
 		; is counting down
-		move.l	grid_match_t,d0
+		move.l	grid_timer,d0
 		move.l	d0,counter
 		jsr	debug_bars
 		
@@ -126,22 +128,30 @@ grid_update:
 		beq	gu_init
 		
 		subq.l	#1,d0
-		move.l	d0,grid_match_t
+		move.l	d0,grid_timer
 		
-		; if the counter has just hit 0 then continue
+		; if the counter has just hit 0 then everything's
+		; ready to go again
+		
 		cmp.l	#0,d0
-		beq	gu_init
+		bne	gu_done
 		
-		movem.l	(sp)+,d0-d6/a0-a3
-		rts
+		; spawn a new group of gems for the player
+		jsr	rand
+		and.b	#3,d0
+		addq.b	#1,d0
+		lea	grid,a0
+		adda.l	#3,a0
+		move.b	d0,(a0)
+		move.b	#3,grid_plr
+		
 
-		; pre-processing before the main update
+gu_init:	; pre-processing before the main update
 		; for now this just clears existing flags
 		; later on it should allow for double
 		; buffering so logic can be run every frame
 
-
-gu_init:	lea	grid,a0
+		lea	grid,a0
 		move.l	#grid_c-1,d0
 		
 		move.b	#1,grid_stable		; reset stable flag
@@ -189,7 +199,7 @@ gu_skip:
 		suba.l	#1,a0
 		dbf	d0,gu_loop
 		
-		movem.l (sp)+,d0-d6/a0-a3
+gu_done:	movem.l (sp)+,d0-d6/a0-a3
 		rts
 
 
@@ -226,7 +236,7 @@ grid_matches:	movem.l	d0-d6/a0-a3,-(sp)
 		; if the match timer is still counting then
 		; do nothing here. This is to ensure the player
 		; sees what happens when a match is made
-		move.l	grid_match_t,d0
+		move.l	grid_timer,d0
 		cmp.l	#0,d0
 		beq	gm_start
 		jmp	match_skip
@@ -294,8 +304,12 @@ gm_noinc:
 		suba.l	#1,a0		; next gem
 		dbf	d0,gm_loop		
 
-match_skip:		
-		movem.l	(sp)+,d0-d6/a0-a3
+		; set the timer to run whether there was a match
+		; or not so there's a gap before the player's
+		; next gems drop.
+		move.l	#16,grid_timer		
+			
+match_skip:	movem.l	(sp)+,d0-d6/a0-a3
 		rts
 
 		
@@ -328,13 +342,11 @@ grid_check_3:	; d3 holds current value
 		beq	gc3_setflags
 
 
-gc3_setflags:	move.l	#11,grid_match_t	; Match!
-		
-		or.b	#grid_match_f,(a0)
+gc3_setflags:	or.b	#grid_match_f,(a0)	; match!
 		or.b	#grid_match_f,(a1)	; flag ready for
 		or.b	#grid_match_f,(a2)	; clearing next time
 								
-gc3_noop:		movem.l	(sp)+,d6/a0-a2
+gc3_noop:	movem.l	(sp)+,d6/a0-a2
 		rts
 
 
@@ -360,10 +372,14 @@ dg1:
 		btst	#grid_clr1_bit,d4	; need to clear?
 		bne	dg_bg
 		
-		btst	#grid_match_bit,d4	; matched?
-		bne	dg_yellow
+		move.l	ticks,d5
+		and.l	#4,d5
+		beq	dg_type
 		
-		and.b	#grid_type_mask,d4
+		btst	#grid_match_bit,d4	; matched?
+		bne	dg_white
+		
+dg_type:	and.b	#grid_type_mask,d4
 
 		cmp.b	#0,d4			; zero, so skip
 		beq	dg_bg ; temp - draw bg to clear everything
@@ -373,6 +389,9 @@ dg1:
 	
 		cmp.b	#2,d4		
 		beq	dg_red
+		
+		cmp.b	#3,d4
+		beq	dg_yellow
 		
 		; blue
 		move.w	#$1f,d1
@@ -385,6 +404,9 @@ dg_yellow:	move.w	#$ffe0,d1
 		bra	dg_draw
 
 dg_red:		move.w	#$f800,d1
+		bra	dg_draw
+
+dg_white:	move.w	#$ffff,d1
 	
 dg_draw:	movea.l	a1,a0
 		
@@ -471,6 +493,8 @@ dg_drawbg:
 
 	section bss
 
-grid_match_t	ds.l	1
+grid_plr	ds.b	1
+
+grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
 grid_stable	ds.b	1
