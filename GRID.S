@@ -97,13 +97,14 @@ rg1:		movem.l	d1-d2/a0-a2,-(sp)
 		movem.l	(sp)+,d1-d2/a0-a2
 		and.l	#3,d0
 
-		move.b	d0,(a0)
-		or.b	#grid_skip_f,(a0)+
-		
+		move.b	d0,(a0)+
+
 		;addq.l	#1,d0
 		;and.l	#3,d0
 
 		dbf	d1,rg1
+		
+		move	#0,grid_stable
 
 
 		movem.l	(sp)+,d0-d2/a0		
@@ -142,6 +143,8 @@ grid_update:
 
 gu_init:	lea	grid,a0
 		move.l	#grid_c-1,d0
+		
+		move.b	#1,grid_stable		; reset stable flag
 
 gu_init_loop:	btst	#grid_match_bit,(a0)	; check for match
 		beq	gu_init_clear		
@@ -179,10 +182,7 @@ gu_loop:	moveq.l	#0,d3
 		beq	gu_skip			; empty above, no-op
 
 		move.b	d4,(a0)			; else move the type down
-		or.b	#grid_skip_f,(a0)	; set skip flag for moving
-		
-		; BUG - skip flag should not be set for the last row!
-		
+		move.b	#0,grid_stable		; clear stable flag		
 		move.b	#grid_clr1_f,(a1)	; and set above to 0
 		
 gu_skip:	
@@ -217,17 +217,20 @@ gu_skip:
 
 grid_matches:	movem.l	d0-d6/a0-a3,-(sp)
 
+		; if the grid isn't stable then skip
+		moveq.l	#0,d0
+		move.b	grid_stable,d0
+		cmp.b	#1,d0
+		bne	match_skip
+
 		; if the match timer is still counting then
 		; do nothing here. This is to ensure the player
 		; sees what happens when a match is made
 		move.l	grid_match_t,d0
 		cmp.l	#0,d0
 		beq	gm_start
+		jmp	match_skip
 		
-		movem.l	(sp)+,d0-d6/a0-a3
-		rts
-		
-
 		; start at end (bottom right)
 		; don't need to check the last two rows as
 		; they'll be covered by the other tests
@@ -249,9 +252,6 @@ gm_loop:	move.b	(a0),d3
 		btst	#grid_clr1_bit,d3	; flagged as clear?
 		bne	gm_skip
 		
-		btst	#grid_skip_bit,d3	; flagged as skip (moving)?
-		bne	gm_skip
-
 		and.b	#grid_type_mask,d3
 		cmp.b	#0,d3			; empty?
 		beq	gm_skip
@@ -473,4 +473,4 @@ dg_drawbg:
 
 grid_match_t	ds.l	1
 grid		ds.b	grid_w*grid_h
-filler		ds.b	1
+grid_stable	ds.b	1

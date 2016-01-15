@@ -152,13 +152,8 @@ p1_done:	; move the player sprite to the new position
 		cmp	#1,d0
 		beq	game_loop_skip
 
-		; don't check for matches right after upate
-		; or the player never sees the gems when they've
-		; fallen all the way
+		jsr	grid_update
 		jsr	grid_matches
-
-		
-		jsr 	grid_update
 
 
 		; now restore the bg for the player
