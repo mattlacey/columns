@@ -43,8 +43,9 @@ p1_input_done:
 		; run the grid update every other frame to
 		; simplify the rendering
 		move.l	ticks,d0
-		and.l	#1,d0
-		beq	game_loop_skip
+		and.l	#3,d0
+		cmp.b	#3,d0
+		bne	game_loop_skip
 		
 		jsr	clear_debug
 		jsr	grid_update
