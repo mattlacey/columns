@@ -110,22 +110,97 @@ rg1:		jsr	rand
 
 
 
+grid_plr_left:	movem.l	d0/a0-a2,-(sp)
+		lea	grid_plr,a0
+		cmp.b	#0,grid_plr_x(a0)	; check x-pos
+		beq	gpl_done
+		
+		movem.l	grid_plr_a(a0),a1	; see if square to the
+		subq.l	#1,a1			; left is empty
+		move.b	(a1),d0
+		and.b	#grid_type_mask,d0
+		cmp.b	#0,d0
+		bne	gpl_done		; not empty
+		
+		subq.b	#1,grid_plr_x(a0)	; update player x
+		subq.b	#1,grid_plr_i(a0)	; update player index
+		
+		movem.l	grid_plr_a(a0),a2	; move the gem
+		move.b	(a2),(a1)
+		move.b	#grid_clr1_f,(a2)
+		
+		movem.l	a1,grid_plr_a(a0)	; update player address		
+
+gpl_done:	movem.l	(sp)+,d0/a0-a2
+		rts
+
+
+
+
+grid_plr_right:	movem.l	d0/a0-a2,-(sp)
+		lea	grid_plr,a0
+		cmp.b	#grid_w-1,grid_plr_x(a0)	; check x-pos
+		beq	gpl_done
+		
+		movem.l	grid_plr_a(a0),a1	; see if square to the
+		addq.l	#1,a1			; right is empty
+		move.b	(a1),d0
+		and.b	#grid_type_mask,d0
+		cmp.b	#0,d0
+		bne	gpr_done		; not empty
+		
+		addq.b	#1,grid_plr_x(a0)	; update player x
+		addq.b	#1,grid_plr_i(a0)	; update player index
+		
+		movem.l	grid_plr_a(a0),a2	; move the gem
+		move.b	(a2),(a1)
+		move.b	#grid_clr1_f,(a2)
+		
+		movem.l	a1,grid_plr_a(a0)	; update player address		
+
+gpr_done:	movem.l	(sp)+,d0/a0-a2
+	
+		rts
+		
+grid_plr_inc_y:	move.l	a0,-(sp)		; only to be called
+		lea	grid_plr,a0		; when the grid is unstable
+		addq.b	#1,grid_plr_y(a0)
+		addq.b	#1,grid_plr_i(a0)
+		add.l	#grid_w,grid_plr_a(a0)
+		move.l	(sp)+,a0
+		rts
+		
+		
+		
+		
+grid_plr_spawn:
+		jsr	rand
+		and.b	#3,d0
+		addq.b	#1,d0
+		lea	grid,a0
+		adda.l	#3,a0
+
+		lea	grid_plr,a1
+		move.b	#3,grid_plr_x(a1)	; player base x, y
+		move.b	#0,grid_plr_y(a1)
+		move.b	#3,grid_plr_i(a1)	; index of base gem
+		move.l	a0,grid_plr_a(a1)	; address of base gem
+		move.b	d0,(a0)			; update the grid
+		rts
+		
+
+
+
 grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 
-		; first update the player's index as needed
-		; based on inputs
-		
-gu_input:
-		
-		
-		; don't do any other updates while the timer
+		; don't do any updates while the timer
 		; is counting down
 		move.l	grid_timer,d0
-		move.l	d0,counter
-		jsr	debug_bars
+;		move.l	d0,counter
+;		jsr	debug_bars
 		
 		cmp.l	#0,d0
-		beq	gu_init
+		beq	gu_input
 		
 		subq.l	#1,d0
 		move.l	d0,grid_timer
@@ -136,14 +211,31 @@ gu_input:
 		cmp.l	#0,d0
 		bne	gu_done
 		
+		; first update the player's info as needed
+		; based on inputs
+		
+gu_input:	moveq.l	#0,d0
+		; move.b	joy1,d0
+		move.b	joy2,d0
+		
+		btst	#2,d0
+		beq	gu_input_right		
+		jsr	grid_plr_left
+
+gu_input_right:	btst	#3,d0
+		beq	gu_input_done
+		jsr	grid_plr_right
+		
+gu_input_done:		
+
+		
+		; if there have been no matches then
 		; spawn a new group of gems for the player
-		jsr	rand
-		and.b	#3,d0
-		addq.b	#1,d0
-		lea	grid,a0
-		adda.l	#3,a0
-		move.b	d0,(a0)
-		move.b	#3,grid_plr
+		; if the last check found matches we need
+		; to check again
+		cmp.b	#0,grid_matched
+		bne	gu_init
+		jsr	grid_plr_spawn
 		
 
 gu_init:	; pre-processing before the main update
@@ -180,7 +272,7 @@ gu_loop:	moveq.l	#0,d3
 
 		cmp.b	#0,d3
 		bgt	gu_skip			; skip filled squares
-
+		
 		move.l	a0,a1			; get square above
 		suba.l	#grid_w,a1		; address into a1 
 
@@ -198,6 +290,10 @@ gu_loop:	moveq.l	#0,d3
 gu_skip:	
 		suba.l	#1,a0
 		dbf	d0,gu_loop
+		
+		cmp.b	#1,grid_stable		; if the grid is unstable
+		beq	gu_done			; the player must be moved
+		jsr	grid_plr_inc_y
 		
 gu_done:	movem.l (sp)+,d0-d6/a0-a3
 		rts
@@ -245,6 +341,8 @@ grid_matches:	movem.l	d0-d6/a0-a3,-(sp)
 		; don't need to check the last two rows as
 		; they'll be covered by the other tests
 gm_start:	lea	grid,a0
+
+		move.b	#0,grid_matched	; reset the overall match flag
 
 		adda.l	#grid_c-1,a0
 		move.l	#grid_c-1,d0
@@ -345,6 +443,7 @@ grid_check_3:	; d3 holds current value
 gc3_setflags:	or.b	#grid_match_f,(a0)	; match!
 		or.b	#grid_match_f,(a1)	; flag ready for
 		or.b	#grid_match_f,(a2)	; clearing next time
+		move.b	#1,grid_matched		; set global flag
 								
 gc3_noop:	movem.l	(sp)+,d6/a0-a2
 		rts
@@ -492,8 +591,20 @@ dg_drawbg:
 		rts
 
 	section bss
+		
 
-grid_plr	ds.b	1
+grid_plr_s:	equ	7
+		
+		rsreset
+grid_plr_x:	rs.b	1
+grid_plr_y:	rs.b	1
+grid_plr_i:	rs.b	1
+grid_plr_a:	rs.l	1
+
+grid_plr:	ds.b	grid_plr_s
+
+
+grid_matched	ds.b	0
 
 grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
