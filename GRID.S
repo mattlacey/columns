@@ -115,21 +115,33 @@ grid_plr_left:	movem.l	d0/a0-a2,-(sp)
 		cmp.b	#0,grid_plr_x(a0)	; check x-pos
 		beq	gpl_done
 		
-		movem.l	grid_plr_a(a0),a1	; see if square to the
-		subq.l	#1,a1			; left is empty
-		move.b	(a1),d0
+		move.l	grid_plr_a(a0),a1	; see if square to the
+		move.b	(a1-1),d0		; left is empty
 		and.b	#grid_type_mask,d0
 		cmp.b	#0,d0
 		bne	gpl_done		; not empty
 		
 		subq.b	#1,grid_plr_x(a0)	; update player x
-		subq.b	#1,grid_plr_i(a0)	; update player index
 		
-		movem.l	grid_plr_a(a0),a2	; move the gem
-		move.b	(a2),(a1)
-		move.b	#grid_clr1_f,(a2)
+		move.b	(a1),(a1-1)		; move the gem
+		move.b	#grid_clr1_f,(a1)
+		subq.l	#1,grid_plr_a(a0)	; update player address		
+
+		cmp.b	#0,grid_plr_y(a0)	; don't update other gems
+						; if first row of grid
+		beq	gpl_done
 		
-		movem.l	a1,grid_plr_a(a0)	; update player address		
+		subq.l	#grid_w,a1		; move 2nd gem
+		move.b	(a1),(a1-1)
+		move.b	#grid_clr1_f,(a1)
+		
+		cmp.b	#1,grid_plr_y(a0)
+		beq	gpl_done
+		
+		subq.l	#grid_w,a1		; move 3rd gem
+		move.b	(a1),(a1-1)
+		move.b	#grid_clr1_f,(a1)
+		
 
 gpl_done:	movem.l	(sp)+,d0/a0-a2
 		rts
@@ -140,52 +152,92 @@ gpl_done:	movem.l	(sp)+,d0/a0-a2
 grid_plr_right:	movem.l	d0/a0-a2,-(sp)
 		lea	grid_plr,a0
 		cmp.b	#grid_w-1,grid_plr_x(a0)	; check x-pos
-		beq	gpl_done
+		beq	gpr_done
 		
-		movem.l	grid_plr_a(a0),a1	; see if square to the
-		addq.l	#1,a1			; right is empty
-		move.b	(a1),d0
+		move.l	grid_plr_a(a0),a1	; see if square to the
+		move.b	(a1+1),d0		; right is empty
 		and.b	#grid_type_mask,d0
 		cmp.b	#0,d0
 		bne	gpr_done		; not empty
 		
 		addq.b	#1,grid_plr_x(a0)	; update player x
-		addq.b	#1,grid_plr_i(a0)	; update player index
 		
-		movem.l	grid_plr_a(a0),a2	; move the gem
-		move.b	(a2),(a1)
-		move.b	#grid_clr1_f,(a2)
+		move.b	(a1),(a1+1)		; move the gem
+		move.b	#grid_clr1_f,(a1)
+		addq.l	#1,grid_plr_a(a0)	; update player address		
+
+		cmp.b	#0,grid_plr_y(a0)	; don't update other gems
+						; if first row of grid
+		beq	gpr_done
 		
-		movem.l	a1,grid_plr_a(a0)	; update player address		
+		subq.l	#grid_w,a1		; move 2nd gem
+		move.b	(a1),(a1+1)
+		move.b	#grid_clr1_f,(a1)
+		
+		cmp.b	#1,grid_plr_y(a0)
+		beq	gpr_done
+		
+		subq.l	#grid_w,a1		; move 3rd gem
+		move.b	(a1),(a1+1)
+		move.b	#grid_clr1_f,(a1)
+
 
 gpr_done:	movem.l	(sp)+,d0/a0-a2
 	
 		rts
 		
-grid_plr_inc_y:	move.l	a0,-(sp)		; only to be called
+		
+		
+		
+grid_plr_inc_y:	movem.l	a0-a1,-(sp)		; only to be called
 		lea	grid_plr,a0		; when the grid is unstable
 		addq.b	#1,grid_plr_y(a0)
-		addq.b	#1,grid_plr_i(a0)
 		add.l	#grid_w,grid_plr_a(a0)
-		move.l	(sp)+,a0
+		
+		cmp.b	#2,grid_plr_y(a0)	; if we're on the 2nd or
+		bgt	g_piy_done		; or 3rd row fill in other gems
+		beq	g_piy_row3		; on row 3?
+		
+		
+		move.l	grid_plr_a(a0),a1	; on row 2, so fill in next gem
+		subq.l	#grid_w,a1
+		move.b	grid_plr_g2(a0),(a1)
+		jmp	g_piy_done
+
+g_piy_row3:	move.l	grid_plr_a(a0),a1	; on row 3, fill in last gem
+		sub.l	#grid_w*2,a1
+		move.b	grid_plr_g3(a0),(a1)	
+		
+g_piy_done:	movem.l	(sp)+,a0-a1
 		rts
 		
 		
 		
-		
-grid_plr_spawn:
-		jsr	rand
+
+grid_rand_gem:	jsr	rand		
 		and.b	#3,d0
 		addq.b	#1,d0
-		lea	grid,a0
+		rts
+
+
+
+
+grid_plr_spawn:	lea	grid,a0
 		adda.l	#3,a0
 
 		lea	grid_plr,a1
 		move.b	#3,grid_plr_x(a1)	; player base x, y
 		move.b	#0,grid_plr_y(a1)
-		move.b	#3,grid_plr_i(a1)	; index of base gem
 		move.l	a0,grid_plr_a(a1)	; address of base gem
+		
+		jsr	grid_rand_gem
 		move.b	d0,(a0)			; update the grid
+		
+		jsr	grid_rand_gem		; store the two that will
+		move.b	d0,grid_plr_g2(a1)	; appear next so the player
+		jsr	grid_rand_gem		; can still rotate through
+		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
+		
 		rts
 		
 
@@ -596,10 +648,12 @@ dg_drawbg:
 grid_plr_s:	equ	7
 		
 		rsreset
-grid_plr_x:	rs.b	1
+grid_plr_x:	rs.b	1	; coords of bottom gem
 grid_plr_y:	rs.b	1
-grid_plr_i:	rs.b	1
-grid_plr_a:	rs.l	1
+grid_plr_g2:	rs.b	1	; 2nd and 3rd gem generated on spawn
+grid_plr_g3:	rs.b	1	; need them ready for rotation
+grid_plr_a:	rs.l	1	; current address of bottom gem
+
 
 grid_plr:	ds.b	grid_plr_s
 
