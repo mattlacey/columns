@@ -10,8 +10,8 @@ game_init:	movem.l	d0-a6,-(sp)
 		jsr 	bg_init			; setup grid
 		jsr	grid_init
 		
-		move.l	#8,d0
-		jsr	grid_random
+		;move.l	#8,d0
+		;jsr	grid_random
 		
 		movem.l (sp)+,d0-a6
 		rts
