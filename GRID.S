@@ -183,14 +183,51 @@ grid_plr_right:	movem.l	d0/a0-a1,-(sp)
 		move.b	(a1),(a1+1)
 		move.b	#grid_clr1_f,(a1)
 
-
 gpr_done:	movem.l	(sp)+,d0/a0-a1
 	
 		rts
 		
 		
 		
+
+grid_plr_rot:	movem.l	d0/a0-a1,-(sp)		; rotates the player gems
+						; d0 determines direction
+						; 0 is 'up', 1 is 'down'
+		lea	grid_plr,a0
+		move.l	grid_plr_a(a0),a1
+		move.b	(a1),d0
+
+		cmp.b	#2,grid_plr_y(a0)
+		bge	grid_rot_std
 		
+		cmp.b	#1,grid_plr_y(a0)	; first or second line?
+		beq	grid_rot_line2
+		
+		; on line one(0), one gem on screen
+		move.b	grid_plr_g2(a0),(a1)
+		move.b	grid_plr_g3(a0),grid_plr_g2(a0)
+		move.b	d0,grid_plr_g3(a0)
+		jmp	grid_rot_done
+		
+		
+grid_rot_line2:	; on line two, two gems on screen
+		move.b	(a1-grid_w),(a1)
+		move.b	grid_plr_g3(a0),(a1-grid_w)
+		move.b	d0,grid_plr_g3(a0)	
+		jmp	grid_rot_done
+		
+		
+grid_rot_std:	; standard case, rotate in the grid
+		move.b	(a1-grid_w),(a1)
+		move.b	(a1-grid_w*2),(a1-grid_w)
+		move.b	d0,(a1-grid_w*2)
+		
+grid_rot_done:	movem.l	(sp)+,d0/a0-a1
+		rts
+		
+		
+		
+				
 grid_plr_inc_y:	movem.l	a0-a1,-(sp)		; only to be called
 		lea	grid_plr,a0		; when the grid is unstable
 		addq.b	#1,grid_plr_y(a0)
@@ -292,8 +329,12 @@ gu_input:	; process player input if the grid is not stable
 		jsr	grid_plr_left
 
 gu_input_right:	btst	#3,d0
-		beq	gu_input_done
+		beq	gu_input_up
 		jsr	grid_plr_right
+		
+gu_input_up:	btst	#0,d0
+		beq	gu_input_done
+		jsr	grid_plr_rot
 		
 gu_input_done:		
 		
