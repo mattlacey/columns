@@ -49,7 +49,6 @@ p1_input_done:
 		
 		jsr	clear_debug
 		jsr	grid_update
-		jsr	grid_matches
 
 
 game_loop_skip:	jsr	grid_draw

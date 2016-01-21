@@ -43,13 +43,15 @@ grid_skip_bit:	equ	6
 grid_init:	movem.l	d0/a0,-(sp)
 		
 		move.l	#0,grid_timer
-		move.b	#255,grid_plr
-
+		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
 		lea	grid,a0
 ig1:		move.b	#0,(a0)+
 		dbf	d0,ig1
+		
+		move.b	#0,grid_matched
+		move.b	#1,grid_stable
 	
 		movem.l	(sp)+,d0/a0
 		rts
@@ -110,7 +112,7 @@ rg1:		jsr	rand
 
 
 
-grid_plr_left:	movem.l	d0/a0-a2,-(sp)
+grid_plr_left:	movem.l	d0/a0-a1,-(sp)
 		lea	grid_plr,a0
 		cmp.b	#0,grid_plr_x(a0)	; check x-pos
 		beq	gpl_done
@@ -143,13 +145,13 @@ grid_plr_left:	movem.l	d0/a0-a2,-(sp)
 		move.b	#grid_clr1_f,(a1)
 		
 
-gpl_done:	movem.l	(sp)+,d0/a0-a2
+gpl_done:	movem.l	(sp)+,d0/a0-a1
 		rts
 
 
 
 
-grid_plr_right:	movem.l	d0/a0-a2,-(sp)
+grid_plr_right:	movem.l	d0/a0-a1,-(sp)
 		lea	grid_plr,a0
 		cmp.b	#grid_w-1,grid_plr_x(a0)	; check x-pos
 		beq	gpr_done
@@ -182,7 +184,7 @@ grid_plr_right:	movem.l	d0/a0-a2,-(sp)
 		move.b	#grid_clr1_f,(a1)
 
 
-gpr_done:	movem.l	(sp)+,d0/a0-a2
+gpr_done:	movem.l	(sp)+,d0/a0-a1
 	
 		rts
 		
@@ -222,7 +224,8 @@ grid_rand_gem:	jsr	rand
 
 
 
-grid_plr_spawn:	lea	grid,a0
+grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
+		lea	grid,a0
 		adda.l	#3,a0
 
 		lea	grid_plr,a1
@@ -237,7 +240,7 @@ grid_plr_spawn:	lea	grid,a0
 		move.b	d0,grid_plr_g2(a1)	; appear next so the player
 		jsr	grid_rand_gem		; can still rotate through
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
-		
+		movem.l	(sp)+,d0/a0-a1
 		rts
 		
 
@@ -257,16 +260,30 @@ grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 		subq.l	#1,d0
 		move.l	d0,grid_timer
 		
-		; if the counter has just hit 0 then everything's
-		; ready to go again
+		; if the counter has just hit 0
+		; we're ready to go again
 		
 		cmp.l	#0,d0
 		bne	gu_done
 		
-		; first update the player's info as needed
-		; based on inputs
+		; if stable and no matches then spawn
+		cmp.b	#1,grid_stable
+		bne	gu_input
 		
-gu_input:	moveq.l	#0,d0
+		cmp.b	#1,grid_matched
+		beq	gu_input_done
+		jsr	grid_plr_spawn
+		
+
+
+		; if the grid is stable then skip input
+;		cmp.b	#1,grid_stable
+;		beq	gu_input_done
+		
+		
+gu_input:	; process player input if the grid is not stable
+		
+		moveq.l	#0,d0
 		; move.b	joy1,d0
 		move.b	joy2,d0
 		
@@ -279,15 +296,6 @@ gu_input_right:	btst	#3,d0
 		jsr	grid_plr_right
 		
 gu_input_done:		
-
-		
-		; if there have been no matches then
-		; spawn a new group of gems for the player
-		; if the last check found matches we need
-		; to check again
-		cmp.b	#0,grid_matched
-		bne	gu_init
-		jsr	grid_plr_spawn
 		
 
 gu_init:	; pre-processing before the main update
@@ -343,11 +351,18 @@ gu_skip:
 		suba.l	#1,a0
 		dbf	d0,gu_loop
 		
-		cmp.b	#1,grid_stable		; if the grid is unstable
-		beq	gu_done			; the player must be moved
-		jsr	grid_plr_inc_y
+		cmp.b	#1,grid_stable		; if the grid stable run matches
+		bne	gu_unstable
+		jsr	grid_matches
+		jmp	gu_done		
+
+gu_unstable:	cmp.b	#1,grid_matched		; if unstable and  matched
+		beq	gu_done			; then we're done
 		
-gu_done:	movem.l (sp)+,d0-d6/a0-a3
+		jsr	grid_plr_inc_y		; otherwise increment player y		
+
+gu_done:	
+		movem.l (sp)+,d0-d6/a0-a3
 		rts
 
 
@@ -374,20 +389,6 @@ gu_done:	movem.l (sp)+,d0-d6/a0-a3
 
 
 grid_matches:	movem.l	d0-d6/a0-a3,-(sp)
-
-		; if the grid isn't stable then skip
-		moveq.l	#0,d0
-		move.b	grid_stable,d0
-		cmp.b	#1,d0
-		bne	match_skip
-
-		; if the match timer is still counting then
-		; do nothing here. This is to ensure the player
-		; sees what happens when a match is made
-		move.l	grid_timer,d0
-		cmp.l	#0,d0
-		beq	gm_start
-		jmp	match_skip
 		
 		; start at end (bottom right)
 		; don't need to check the last two rows as
@@ -457,7 +458,10 @@ gm_noinc:
 		; set the timer to run whether there was a match
 		; or not so there's a gap before the player's
 		; next gems drop.
-		move.l	#16,grid_timer		
+		move.l	#8,grid_timer
+		cmp.b	#1,grid_matched
+		bne	match_skip
+		addq.l	#8,grid_timer
 			
 match_skip:	movem.l	(sp)+,d0-d6/a0-a3
 		rts
@@ -645,20 +649,20 @@ dg_drawbg:
 	section bss
 		
 
-grid_plr_s:	equ	7
+grid_plr_s	equ	8
 		
 		rsreset
-grid_plr_x:	rs.b	1	; coords of bottom gem
-grid_plr_y:	rs.b	1
-grid_plr_g2:	rs.b	1	; 2nd and 3rd gem generated on spawn
-grid_plr_g3:	rs.b	1	; need them ready for rotation
-grid_plr_a:	rs.l	1	; current address of bottom gem
+grid_plr_x	rs.b	1	; coords of bottom gem
+grid_plr_y	rs.b	1
+grid_plr_g2	rs.b	1	; 2nd and 3rd gem generated on spawn
+grid_plr_g3	rs.b	1	; need them ready for rotation
+grid_plr_a	rs.l	1	; current address of bottom gem
 
 
-grid_plr:	ds.b	grid_plr_s
+grid_plr	ds.b	grid_plr_s
 
 
-grid_matched	ds.b	0
+grid_matched	ds.b	1
 
 grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
