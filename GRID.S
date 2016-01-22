@@ -26,7 +26,9 @@ grid_skip_f:	equ	$40			; skip flag - for now
 						; this is only set when
 						; a gem is falling down
 						; the screen.
-						
+
+grid_fast_on:	equ	$0
+grid_fast_off:	equ	$ffffffff						
 
 grid_type_wild:	equ	7
 
@@ -42,7 +44,9 @@ grid_skip_bit:	equ	6
 
 grid_init:	movem.l	d0/a0,-(sp)
 		
-		move.l	#0,grid_timer
+		move.l	#4,grid_speed
+		move.l	grid_speed,grid_timer
+		move.l	#grid_fast_off,grid_fast
 		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
@@ -277,6 +281,8 @@ grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 		move.b	d0,grid_plr_g2(a1)	; appear next so the player
 		jsr	grid_rand_gem		; can still rotate through
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
+		
+		move.b	#0,grid_stable
 		movem.l	(sp)+,d0/a0-a1
 		rts
 		
@@ -285,24 +291,6 @@ grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 
 grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 
-		; don't do any updates while the timer
-		; is counting down
-		move.l	grid_timer,d0
-;		move.l	d0,counter
-;		jsr	debug_bars
-		
-		cmp.l	#0,d0
-		beq	gu_input
-		
-		subq.l	#1,d0
-		move.l	d0,grid_timer
-		
-		; if the counter has just hit 0
-		; we're ready to go again
-		
-		cmp.l	#0,d0
-		bne	gu_done
-		
 		; if stable and no matches then spawn
 		cmp.b	#1,grid_stable
 		bne	gu_input
@@ -310,13 +298,7 @@ grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 		cmp.b	#1,grid_matched
 		beq	gu_input_done
 		jsr	grid_plr_spawn
-		
-
-
-		; if the grid is stable then skip input
-;		cmp.b	#1,grid_stable
-;		beq	gu_input_done
-		
+				
 		
 gu_input:	; process player input if the grid is not stable
 		
@@ -333,11 +315,33 @@ gu_input_right:	btst	#3,d0
 		jsr	grid_plr_right
 		
 gu_input_up:	btst	#0,d0
-		beq	gu_input_done
+		beq	gu_input_down
 		jsr	grid_plr_rot
 		
-gu_input_done:		
+gu_input_down:	btst	#1,d0
+		beq	gu_input_done
+		move.l	#grid_fast_on,grid_fast
 		
+gu_input_done:	; don't do any updates while the timer
+		; is counting down
+		move.l	grid_timer,d0
+		
+		cmp.l	#0,d0
+		beq	gu_init
+				
+		subq.l	#1,d0
+		move.l	d0,grid_timer
+		
+		; if the counter has just hit 0
+		; we're ready to go again
+		
+		cmp.l	#0,d0
+		bne	gu_done
+		
+		move.l	grid_speed,d0
+		and.l	grid_fast,d0
+		move.l	d0,grid_timer
+
 
 gu_init:	; pre-processing before the main update
 		; for now this just clears existing flags
@@ -395,6 +399,7 @@ gu_skip:
 		cmp.b	#1,grid_stable		; if the grid stable run matches
 		bne	gu_unstable
 		jsr	grid_matches
+		move.l	#grid_fast_off,grid_fast
 		jmp	gu_done		
 
 gu_unstable:	cmp.b	#1,grid_matched		; if unstable and  matched
@@ -701,6 +706,9 @@ grid_plr_a	rs.l	1	; current address of bottom gem
 
 
 grid_plr	ds.b	grid_plr_s
+
+grid_speed	ds.l	1
+grid_fast	ds.l	1
 
 
 grid_matched	ds.b	1
