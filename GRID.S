@@ -585,27 +585,32 @@ dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#0,d4			; zero, so skip
 		beq	dg_bg ; temp - draw bg to clear everything
 		
+		movea.l	a1,a0
+		jsr	dg_drawbg
+		movea.l	a1,a0
+		
 		cmp.b	#1,d4			; render gem		
-		beq	dg_green
+		beq	dg_1
 	
 		cmp.b	#2,d4		
-		beq	dg_red
+		beq	dg_2
 		
 		cmp.b	#3,d4
-		beq	dg_yellow
+		beq	dg_3
 		
-		; blue
-		move.w	#$1f,d1
-		bra	dg_draw
+		; 4
+		jsr	gems3
+		bra	dg_clear		
 
-dg_green:	move.w	#$07e0,d1
-		bra	dg_draw
 
-dg_yellow:	move.w	#$ffe0,d1
-		bra	dg_draw
+dg_1:		jsr	gems0
+		bra	dg_clear
 
-dg_red:		move.w	#$f800,d1
-		bra	dg_draw
+dg_2:		jsr	gems1
+		bra	dg_clear
+
+dg_3:		jsr	gems2
+		bra	dg_clear
 
 dg_white:	move.w	#$ffff,d1
 	

@@ -55,7 +55,7 @@ scr_d:		equ	2					;depth  (in bytes)
 
 startupmenu:	equ	0					;1 = enable startup menu
 
-dspmodmusic:	equ	0					;1 = use dspmod music
+dspmodmusic:	equ	1					;1 = use dspmod music
 mp2music:	equ	0					;1 = use mpeg1 layer 2 music
 								;select which mod or mp2 file
 								;to load in sys/dspmod.s or
@@ -265,12 +265,12 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include 'backgrnd.s'
 		include 'joy.s'
 		include 'cexit.s'
-		include 'sprites.s'
+;		include 'sprites.s'
 		include 'game.s'
 		include 'grid.s'
 		include 'util.s'
 
-		include 'data\ship.s'
+		include 'data\gems.s'
 		
 ; --------------------------------------------------------------
 		section	data
