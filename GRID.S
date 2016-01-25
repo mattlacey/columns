@@ -194,39 +194,60 @@ gpr_done:	movem.l	(sp)+,d0/a0-a1
 		
 		
 
-grid_plr_rot:	movem.l	d0/a0-a1,-(sp)		; rotates the player gems
+grid_plr_rot:	movem.l	d1/a0-a1,-(sp)		; rotates the player gems
 						; d0 determines direction
 						; 0 is 'up', 1 is 'down'
 		lea	grid_plr,a0
 		move.l	grid_plr_a(a0),a1
-		move.b	(a1),d0
+		move.b	(a1),d1
 
 		cmp.b	#2,grid_plr_y(a0)
 		bge	grid_rot_std
 		
 		cmp.b	#1,grid_plr_y(a0)	; first or second line?
-		beq	grid_rot_line2
+		beq	grid_rot_l2
 		
 		; on line one(0), one gem on screen
-		move.b	grid_plr_g2(a0),(a1)
+		cmp.b	#1,d0
+		beq	grid_rot_l1d
+		move.b	grid_plr_g3(a0),(a1)
+		move.b	grid_plr_g2(a0),grid_plr_g3(a0)
+		move.b	d1,grid_plr_g2(a0)
+		jmp	grid_rot_done		
+
+grid_rot_l1d:	move.b	grid_plr_g2(a0),(a1)
 		move.b	grid_plr_g3(a0),grid_plr_g2(a0)
-		move.b	d0,grid_plr_g3(a0)
+		move.b	d1,grid_plr_g3(a0)
 		jmp	grid_rot_done
 		
 		
-grid_rot_line2:	; on line two, two gems on screen
-		move.b	(a1-grid_w),(a1)
+grid_rot_l2:	; on line two, two gems on screen
+		cmp.b	#1,d0
+		beq	grid_rot_l2d
+		move.b	grid_plr_g3(a0),(a1)
+		move.b	(a1-grid_w),grid_plr_g3(a0)
+		move.b	d1,(a1-grid_w)
+		jmp	grid_rot_done
+
+grid_rot_l2d:	move.b	(a1-grid_w),(a1)
 		move.b	grid_plr_g3(a0),(a1-grid_w)
-		move.b	d0,grid_plr_g3(a0)	
+		move.b	d1,grid_plr_g3(a0)	
 		jmp	grid_rot_done
 		
 		
 grid_rot_std:	; standard case, rotate in the grid
-		move.b	(a1-grid_w),(a1)
+		cmp.b	#1,d0
+		beq	grid_rot_stdd
+		move.b	(a1-grid_w*2),(a1)
+		move.b	(a1-grid_w),(a1-grid_w*2)
+		move.b	d1,(a1-grid_w)	
+		jmp	grid_rot_done
+
+grid_rot_stdd:	move.b	(a1-grid_w),(a1)
 		move.b	(a1-grid_w*2),(a1-grid_w)
-		move.b	d0,(a1-grid_w*2)
+		move.b	d1,(a1-grid_w*2)
 		
-grid_rot_done:	movem.l	(sp)+,d0/a0-a1
+grid_rot_done:	movem.l	(sp)+,d1/a0-a1
 		rts
 		
 		
@@ -281,7 +302,8 @@ grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 		move.b	d0,grid_plr_g2(a1)	; appear next so the player
 		jsr	grid_rand_gem		; can still rotate through
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
-		
+	
+		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
 		movem.l	(sp)+,d0/a0-a1
 		rts
@@ -316,7 +338,10 @@ gu_input_right:	btst	#3,d0
 		
 gu_input_up:	btst	#0,d0
 		beq	gu_input_down
+		move.l	d0,-(sp)
+		move.l	#0,d0
 		jsr	grid_plr_rot
+		move.l	(sp)+,d0
 		
 gu_input_down:	btst	#1,d0
 		beq	gu_input_done
@@ -399,7 +424,6 @@ gu_skip:
 		cmp.b	#1,grid_stable		; if the grid stable run matches
 		bne	gu_unstable
 		jsr	grid_matches
-		move.l	#grid_fast_off,grid_fast
 		jmp	gu_done		
 
 gu_unstable:	cmp.b	#1,grid_matched		; if unstable and  matched
@@ -508,6 +532,7 @@ gm_noinc:
 		cmp.b	#1,grid_matched
 		bne	match_skip
 		addq.l	#8,grid_timer
+		move.l	#grid_fast_on,grid_fast
 			
 match_skip:	movem.l	(sp)+,d0-d6/a0-a3
 		rts
