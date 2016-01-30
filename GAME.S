@@ -10,6 +10,19 @@ game_init:	movem.l	d0-a6,-(sp)
 		jsr 	bg_init			; setup grid
 		jsr	bg_draw
 
+		jsr	font_load
+		
+		movea.l	screen_adr1,a0
+		adda.l	#scr_w*2+4,a0
+		lea	txt_welcome,a1
+		jsr	font_print
+		
+		movea.l	screen_adr2,a0
+		adda.l	#scr_w*2+4,a0
+		lea	txt_welcome,a1
+		jsr	font_print
+
+
 		jsr	grid_init
 		
 		;move.l	#8,d0
@@ -24,17 +37,9 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 game_loop:	movem.l	d0-a6,-(sp)
-		addq.l	#1,ticks
-				
-		jsr	clear_debug
+		addq.l	#1,ticks			
 		jsr	grid_update
-		
-		move.l	p1_score,d0
-		jsr	debug_bars
-
-
-
-
+	
 game_loop_skip:	
 		jsr	grid_draw
 	
@@ -43,6 +48,8 @@ game_loop_skip:
 
 
 		section data
+		
+txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
 
 		section bss
 
