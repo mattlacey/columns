@@ -8,10 +8,14 @@ game_init:	movem.l	d0-a6,-(sp)
 		move.l	#0,ticks		; clear ticks
 
 		jsr 	bg_init			; setup grid
+		jsr	bg_draw
+
 		jsr	grid_init
 		
 		;move.l	#8,d0
 		;jsr	grid_random
+		
+		move.l	#0,p1_score
 		
 		movem.l (sp)+,d0-a6
 		rts
@@ -20,22 +24,19 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 game_loop:	movem.l	d0-a6,-(sp)
-		move.l	ticks,d7
-		addq.l	#1,d7
-		move.l	d7,ticks
-		
-		; run the grid update every other frame to
-		; simplify the rendering
-		move.l	ticks,d0
-		and.l	#1,d0
-		cmp.b	#1,d0
-		bne	game_loop_skip
-		
+		addq.l	#1,ticks
+				
 		jsr	clear_debug
 		jsr	grid_update
+		
+		move.l	p1_score,d0
+		jsr	debug_bars
 
 
-game_loop_skip:	jsr	grid_draw
+
+
+game_loop_skip:	
+		jsr	grid_draw
 	
 		movem.l	(sp)+,d0-a6
 		rts
@@ -43,27 +44,9 @@ game_loop_skip:	jsr	grid_draw
 
 		section data
 
-; game variables
-ticks		dc.l	1
-paused:		dc.l	1
-
-p1_speed:	dc.l	2
-p1_didfire: 	dc.b	0
-
-
-
 		section bss
 
-
-; character structure - size: 12 bytes
-c_size:		equ	12
-
-		rsreset
-
-c_x:		rs.l	1
-c_y:		rs.l	1
-c_sprite:	rs.l	1
-
-
-player:		ds.b	c_size
-	
+; game variables
+ticks		ds.l	1
+paused:		ds.l	1
+p1_score:	ds.l	1

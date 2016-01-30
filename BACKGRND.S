@@ -4,6 +4,10 @@ bg_init:	movem.l	d0/a0,-(sp)
 		lea	background,a0
 		move.l	#$0088,d0
 		jsr	clear_scr
+		
+		move.l	#bg_filename,filename.l
+		move.l	#background,filebuffer.l
+		jsr	loader
 
 		movem.l	(sp)+,d0/a0
 		rts
@@ -12,10 +16,14 @@ bg_init:	movem.l	d0/a0,-(sp)
 
 
 bg_draw:	movem.l	a0-a1,-(sp)
-		movem.l	(sp)+,a0-a1
 		lea	background,a0
-		movea.l	screen_adr,a1
+		movea.l	screen_adr1,a1
 		jsr	full_screen
+		
+		lea	background,a0
+		movea.l	screen_adr2,a1
+		jsr	full_screen
+		movem.l	(sp)+,a0-a1
 		rts
 
 
@@ -73,3 +81,11 @@ bg161:
 		section bss
 		even
 background:	ds.b	scr_w*scr_h*2
+
+
+
+
+		section data
+
+bg_filename	dc.b	'data\MARS.BIN',0
+		even

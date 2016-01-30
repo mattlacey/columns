@@ -104,7 +104,7 @@ mp2_end:	jsr	mp2_player+mp2_stop(pc)			;stop mpeg music
 
 		even
 
-mp2_file:	dc.b	'test.mp2',0				;mp2 filename
+mp2_file:	dc.b	'data\GIRLMARS.MP2',0				;mp2 filename
 		even						;
 
 mp2_player:	incbin	'sys\mp2inc.bin'			;mp2 player

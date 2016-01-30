@@ -44,9 +44,13 @@ grid_skip_bit:	equ	6
 
 grid_init:	movem.l	d0/a0,-(sp)
 		
-		move.l	#4,grid_speed
+		; initialise grid variables
+		move.l	#0,grid_match_c
+		move.l	grid_i_speed,grid_speed
 		move.l	grid_speed,grid_timer
 		move.l	#grid_fast_off,grid_fast
+		
+		move.b	#0,grid_inpt_rot
 		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
@@ -128,6 +132,7 @@ grid_plr_left:	movem.l	d0/a0-a1,-(sp)
 		bne	gpl_done		; not empty
 		
 		subq.b	#1,grid_plr_x(a0)	; update player x
+		move.b	grid_x_speed,grid_inpt_x
 		
 		move.b	(a1),(a1-1)		; move the gem
 		move.b	#grid_clr1_f,(a1)
@@ -167,6 +172,7 @@ grid_plr_right:	movem.l	d0/a0-a1,-(sp)
 		bne	gpr_done		; not empty
 		
 		addq.b	#1,grid_plr_x(a0)	; update player x
+		move.b	grid_x_speed,grid_inpt_x
 		
 		move.b	(a1),(a1+1)		; move the gem
 		move.b	#grid_clr1_f,(a1)
@@ -197,6 +203,10 @@ gpr_done:	movem.l	(sp)+,d0/a0-a1
 grid_plr_rot:	movem.l	d1/a0-a1,-(sp)		; rotates the player gems
 						; d0 determines direction
 						; 0 is 'up', 1 is 'down'
+		cmp.b	#1,grid_inpt_rot
+		beq	grid_rot_done
+		move.b	#1,grid_inpt_rot
+		
 		lea	grid_plr,a0
 		move.l	grid_plr_a(a0),a1
 		move.b	(a1),d1
@@ -313,7 +323,15 @@ grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 
 grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 
-		; if stable and no matches then spawn
+		; update speed if required
+		cmp.l	#10,grid_match_c
+		blt	grid_spawn_chk
+		sub.l	#10,grid_match_c
+		cmp.l	#0,grid_speed
+		beq	grid_spawn_chk
+		subq.l	#1,grid_speed
+
+grid_spawn_chk:		; if stable and no matches then spawn
 		cmp.b	#1,grid_stable
 		bne	gu_input
 		
@@ -328,6 +346,9 @@ gu_input:	; process player input if the grid is not stable
 		; move.b	joy1,d0
 		move.b	joy2,d0
 		
+		cmp.b	#0,grid_inpt_x
+		bgt	gu_input_cx
+		
 		btst	#2,d0
 		beq	gu_input_right		
 		jsr	grid_plr_left
@@ -336,12 +357,17 @@ gu_input_right:	btst	#3,d0
 		beq	gu_input_up
 		jsr	grid_plr_right
 		
+gu_input_cx:	subq.b	#1,grid_inpt_x
+		
 gu_input_up:	btst	#0,d0
-		beq	gu_input_down
+		beq	gu_input_crot
 		move.l	d0,-(sp)
 		move.l	#0,d0
 		jsr	grid_plr_rot
 		move.l	(sp)+,d0
+		jmp	gu_input_down
+		
+gu_input_crot:	move.b	#0,grid_inpt_rot
 		
 gu_input_down:	btst	#1,d0
 		beq	gu_input_done
@@ -528,7 +554,7 @@ gm_noinc:
 		; set the timer to run whether there was a match
 		; or not so there's a gap before the player's
 		; next gems drop.
-		move.l	#8,grid_timer
+		move.l	grid_speed,grid_timer
 		cmp.b	#1,grid_matched
 		bne	match_skip
 		addq.l	#8,grid_timer
@@ -570,6 +596,10 @@ grid_check_3:	; d3 holds current value
 gc3_setflags:	or.b	#grid_match_f,(a0)	; match!
 		or.b	#grid_match_f,(a1)	; flag ready for
 		or.b	#grid_match_f,(a2)	; clearing next time
+		
+		add.l	#10,p1_score		; increment score, 10 per
+						; group of 3, so 4=20, 5=30
+		addq.l	#1,grid_match_c		; inc. grid match count
 		move.b	#1,grid_matched		; set global flag
 								
 gc3_noop:	movem.l	(sp)+,d6/a0-a2
@@ -716,11 +746,19 @@ dg_drawbg:
 		move.w	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
 		adda.l	#scr_w*2-grid_s*2,a0
+		adda.l	#scr_w*2-grid_s*2,a1
 
 		ENDR
 		
 		movem.l	(sp)+,d0/a0-a1
 		rts
+
+
+	section	data
+
+grid_i_speed	dc.l	8	; initial speed
+grid_x_speed	dc.b	2
+
 
 	section bss
 		
@@ -737,8 +775,14 @@ grid_plr_a	rs.l	1	; current address of bottom gem
 
 grid_plr	ds.b	grid_plr_s
 
+grid_inpt_x	ds.b	1	; rate limiter for x-movement
+grid_inpt_rot	ds.b	1	; used to ensure distinct presses
+				; for rotation
+
 grid_speed	ds.l	1
+
 grid_fast	ds.l	1
+grid_match_c	ds.l	1
 
 
 grid_matched	ds.b	1
