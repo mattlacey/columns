@@ -10,9 +10,9 @@ font_load:	move.l	#font_file,filename.l
 		
 		
 		
-font_print:	movem.l	d0/a1,-(sp)
-
-font_pr_loop:	move.l	#0,d0
+font_print:	movem.l	d0/a1,-(sp)		; a1 should point to a null
+						; terminated string
+font_pr_loop:	move.l	#0,d0			; a0 should hold screen adr
 		move.b	(a1)+,d0
 		cmp.b	#0,d0
 		beq	font_pr_done
