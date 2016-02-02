@@ -571,7 +571,7 @@ grid_check_3:	; d3 holds current value
 		; a0 points to current square
 		; d6,a1-a2 are for working
 		
-		movem.l d6/a0-a2,-(sp)
+		movem.l d0/d6/a0-a2,-(sp)
 
 		move.l	a0,a1
 		
@@ -597,12 +597,12 @@ gc3_setflags:	or.b	#grid_match_f,(a0)	; match!
 		or.b	#grid_match_f,(a1)	; flag ready for
 		or.b	#grid_match_f,(a2)	; clearing next time
 		
-		add.l	#10,p1_score		; increment score, 10 per
+		jsr	game_inc_scr		; increment score, 10 per
 						; group of 3, so 4=20, 5=30
 		addq.l	#1,grid_match_c		; inc. grid match count
 		move.b	#1,grid_matched		; set global flag
 								
-gc3_noop:	movem.l	(sp)+,d6/a0-a2
+gc3_noop:	movem.l	(sp)+,d0/d6/a0-a2
 		rts
 
 
