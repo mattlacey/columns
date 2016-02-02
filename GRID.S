@@ -299,7 +299,18 @@ grid_rand_gem:	jsr	rand
 grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 		lea	grid,a0
 		adda.l	#3,a0
+		
+		move.b	(a0),d0
+		and.b	#grid_type_mask,d0
+		cmp.b	#0,d0
+		beq	grid_ps1
+		
+		; square is occupied, therefore DEAD
+		jsr	game_over
+		bra	grid_ps_done
+		
 
+grid_ps1:
 		lea	grid_plr,a1
 		move.b	#3,grid_plr_x(a1)	; player base x, y
 		move.b	#0,grid_plr_y(a1)
@@ -315,7 +326,8 @@ grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
 	
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
-		movem.l	(sp)+,d0/a0-a1
+		
+grid_ps_done:	movem.l	(sp)+,d0/a0-a1
 		rts
 		
 

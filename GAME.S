@@ -30,6 +30,11 @@ game_init:	movem.l	d0-a6,-(sp)
 		
 		move.l	#0,p1_score
 		move.l	#0,p1_score_d
+		move.l	#0,p1_gameover
+		
+
+		; start the game!
+		move.l	#seq_gameloop,current_fx
 		
 		movem.l (sp)+,d0-a6
 		rts
@@ -38,14 +43,13 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 game_loop:	movem.l	d0-a6,-(sp)
-		addq.l	#1,ticks			
+		addq.l	#1,ticks
+							
 		jsr	grid_update
-	
-game_loop_skip:	
 		jsr	grid_draw
 		jsr	game_draw_scr
-	
-		movem.l	(sp)+,d0-a6
+			
+game_loop_done:	movem.l	(sp)+,d0-a6
 		rts
 		
 		
@@ -83,9 +87,43 @@ game_draw_scr:	movem.l	a0-a1,-(sp)
 
 
 
+game_over_loop:	; game over so print text and do sweet fa
+		movea.l	screen_adr,a0
+		adda.l	#txt_gameover_p,a0
+		lea	txt_gameover,a1
+		jsr	font_print
+		
+		moveq.l	#0,d0				; move on on fire
+		; move.b	joy1,d0
+		move.b	joy2,d0
+
+		btst	#0,d0
+		beq	game_ol_fire
+		move.l	#seq_exit,current_fx
+		bra	game_ol_done
+		
+game_ol_fire:	btst	#7,d0
+		beq	game_ol_done
+		move.l	#seq_gameinit,current_fx
+
+game_ol_done:	rts
+		
+		
+		
+		
+game_over:	move.l	#1,p1_gameover
+		move.l	#seq_gameover,current_fx
+		rts
+		
+		
+		
+				
 		section data
 		
 txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
+txt_gameover	dc.b	'* GAME OVER *',0
+txt_gameover_p	equ	(2*scr_w*116+(scr_w-13*8))	; screen offset
+
 p1_scr_inc:	dc.l	10
 p1_scr_inc_d:	dc.l	$10
 
@@ -96,4 +134,4 @@ ticks		ds.l	1
 paused:		ds.l	1
 p1_score:	ds.l	1
 p1_score_d:	ds.l	1
-p1_gameover:	ds.l	0
+p1_gameover:	ds.l	1
