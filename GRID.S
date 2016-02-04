@@ -641,11 +641,11 @@ dg1:
 		bne	dg_bg
 		
 		move.l	ticks,d5
-		and.l	#4,d5
-		beq	dg_type
+		;and.l	#4,d5
+		;beq	dg_type
 		
 		btst	#grid_match_bit,d4	; matched?
-		bne	dg_white
+		bne	dg_match
 		
 dg_type:	and.b	#grid_type_mask,d4
 
@@ -666,8 +666,8 @@ dg_type:	and.b	#grid_type_mask,d4
 		beq	dg_3
 		
 		; 4
-		jsr	gems3
-		bra	dg_clear		
+		jsr	blue0
+		bra	dg_clear
 
 
 dg_1:		jsr	gems0
@@ -678,6 +678,22 @@ dg_2:		jsr	gems1
 
 dg_3:		jsr	gems2
 		bra	dg_clear
+
+dg_match:	and.b	#grid_type_mask,d4
+
+		cmp.b	#4,d4
+		bne	dg_white
+		
+		; temp - play blue gem animation
+		movea.l	a1,a0
+
+		move.l	d0,-(sp)
+		move.l	#16,d0
+		sub.l	grid_timer,d0
+		jsr	draw_blue
+		move.l	(sp)+,d0
+		bra	dg_clear
+		
 
 dg_white:	move.w	#$ffff,d1
 	
