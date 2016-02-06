@@ -621,7 +621,7 @@ gc3_noop:	movem.l	(sp)+,d0/d6/a0-a2
 
 
 grid_draw:	; draw fixed gems to screen
-		movem.l	d0-d7/a0-a2,-(sp)
+		movem.l	d0-d7/a0-a3,-(sp)
 
 		lea	grid,a2
 		
@@ -629,7 +629,7 @@ grid_draw:	; draw fixed gems to screen
 		adda.l	#grid_x*2,a1
 		adda.l	#grid_y*scr_w*2,a1
 
-		move.l	#grid_c-1,d0		; loop counter		
+		move.l	#grid_c-1,d2		; loop counter		
 		moveq.l	#0,d3			; tracks x-wrapping
 		moveq.l	#0,d4
 
@@ -665,35 +665,58 @@ dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#3,d4
 		beq	dg_3
 		
-		; 4
 		jsr	blue0
 		bra	dg_clear
 
-
-dg_1:		jsr	gems0
+dg_1:		jsr	red0
 		bra	dg_clear
 
-dg_2:		jsr	gems1
+dg_2:		jsr	yellow0
 		bra	dg_clear
 
-dg_3:		jsr	gems2
+dg_3:		jsr	green0
 		bra	dg_clear
 
-dg_match:	and.b	#grid_type_mask,d4
 
-		cmp.b	#4,d4
-		bne	dg_white
-		
-		; temp - play blue gem animation
-		movea.l	a1,a0
+dg_match:	; gems have been matched to do animations
 
-		move.l	d0,-(sp)
-		move.l	#16,d0
+		move.l	a1,a0			; get anim frame
+		move.l	#16,d0		 
 		sub.l	grid_timer,d0
-		jsr	draw_blue
-		move.l	(sp)+,d0
+		cmp.l	#8,d0			; only have 8 frames
+		bge	dg_bg
+		
+		jsr	dg_drawbg
+		move.l	a1,a0
+
+		and.b	#grid_type_mask,d4
+
+		; blue
+		cmp.b	#4,d4
+		bne	dgm_red
+		move.l	#blue_map,a3
+		jsr	grid_draw_gem
+		bra 	dg_clear
+		
+		
+dgm_red:	cmp.b	#1,d4
+		bne	dgm_yellow
+		move.l	#red_map,a3
+		jsr	grid_draw_gem
 		bra	dg_clear
 		
+dgm_yellow:	cmp.b	#2,d4
+		bne	dgm_green
+		move.l	#yellow_map,a3
+		jsr	grid_draw_gem
+		bra	dg_clear
+		
+dgm_green:	cmp.b	#3,d4
+		bne	dg_white
+		move.l	#green_map,a3
+		jsr	grid_draw_gem
+		bra	dg_clear
+				
 
 dg_white:	move.w	#$ffff,d1
 	
@@ -738,9 +761,9 @@ dg_clear:
 		moveq.l	#0,d3
 
 dg_next:		
-		dbf	d0,dg1
+		dbf	d2,dg1
 
-		movem.l	(sp)+,d0-d7/a0-a2
+		movem.l	(sp)+,d0-d7/a0-a3
 		rts
 
 
@@ -780,6 +803,22 @@ dg_drawbg:
 		
 		movem.l	(sp)+,d0/a0-a1
 		rts
+
+
+
+
+grid_draw_gem:					; draws gem sprite from
+		cmp.l	#8,d0			; map in a3, using frame
+		blt	gdg1			; in d0
+		move.l	#7,d0
+			
+gdg1:		lsl	#2,d0
+		adda.l	d0,a3
+		move.l	(a3),a3
+		jsr	(a3)
+		rts
+		
+
 
 
 	section	data

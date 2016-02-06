@@ -274,7 +274,11 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include 'util.s'
 
 		include 'data\gems.s'
+		include 'data\red.s'
 		include 'data\blue.s'
+		include 'data\yellow.s'
+		include 'data\green.s'
+
 		
 ; --------------------------------------------------------------
 		section	data
