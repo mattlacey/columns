@@ -30,7 +30,7 @@ exit:		cmp.w	#9,runlevel				;9=interupts
 		bsr.w	dspmod_end				;restore dspmod
 		endc						;
 		ifne	mp2music				;
-		bsr.w	mp2_end					;restore mp2
+		bsr.l	mp2_end					;restore mp2
 		endc						;
 ;---------------------------------------------------------------
 .r7:		cmp.w	#7,runlevel				;7=keyklick

@@ -1,7 +1,4 @@
 		section text
-
-red_map:	dc.l	red0,red1,red2,red3,red4,red5,red6,red7
-
 red0:
 		adda.l	#10+(scr_w-16)*0,a0
 		move.w	#$A145,(a0)+
@@ -460,9 +457,7 @@ red7:
 		move.w	#$6861,(a0)+
 		rts
 
-		section text
-red8:
-		rts
+red_map:	dc.l	red0,red1,red2,red3,red4,red5,red6,red7
 
 		section text
 red0clear:
@@ -995,7 +990,5 @@ red7clear:
 		move.w	(a1)+,(a0)+
 		rts
 
-		section text
-red8clear:
-		rts
+redclear_map:	dc.l	red0,red1,red2,red3,red4,red5,red6,red7
 

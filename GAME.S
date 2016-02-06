@@ -94,8 +94,8 @@ game_over_loop:	; game over so print text and do sweet fa
 		jsr	font_print
 		
 		moveq.l	#0,d0				; move on on fire
-		; move.b	joy1,d0
-		move.b	joy2,d0
+		move.b	joy1,d0
+		or.b	joy2,d0
 
 		btst	#0,d0
 		beq	game_ol_fire

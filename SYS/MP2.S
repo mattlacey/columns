@@ -46,7 +46,7 @@ mp2_load:
 		tst.l	d0					;file found?
 		beq.s	.ok					;ok
 		move.l	#exit_musicnotfound_text,error_adr	;error message
-		bra.w	exit					;
+		bra.l	exit					;
 
 .ok:		move.l	dta+26,mp2_size				;filelength
 
@@ -59,7 +59,7 @@ mp2_load:
 		tst.l	d0					;ramcheck
 		bne.s	.loadmp2				;ok
 		move.l	#exit_nostram_text,error_adr		;error message
-		bra.w	exit					;
+		bra.l	exit					;
 
 
 .loadmp2:	move.l	d0,mp2_adr				;store address to mp2 file

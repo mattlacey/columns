@@ -61,7 +61,7 @@ mp2music:	equ	0					;1 = use mpeg1 layer 2 music
 								;to load in sys/dspmod.s or
 								;sys/mp2.s
 
-pause:		equ	1					;1 = enable pause on left-shift
+pause:		equ	0					;1 = enable pause on left-shift
 cputime:	equ	0					;1 = enable vbl-time on control
 
 def_vga_freq:	equ	60					;VGA frequency (60 or 100Hz)
@@ -249,14 +249,6 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include	'sys\video.s'				;videolib
 		include	'sys\loader.s'				;loader rout
 
-		ifne	dspmodmusic				;
-		include	'sys\dspmod.s'				;tracker player
-		endc						;
-
-		ifne	mp2music				;
-		include	'sys\mp2.s'				;mpeg player
-		endc						;
-
 		ifne	startupmenu				;
 		include	'sys\startup.s'				;startup menu
 		endc						;
@@ -277,7 +269,18 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include 'data\red.s'
 		include 'data\blue.s'
 		include 'data\yellow.s'
+		include 'data\purple.s'
 		include 'data\green.s'
+
+
+		ifne	dspmodmusic				;
+		include	'sys\dspmod.s'				;tracker player
+		endc						;
+
+		ifne	mp2music				;
+		include	'sys\mp2.s'				;mpeg player
+		endc						;
+
 
 		
 ; --------------------------------------------------------------

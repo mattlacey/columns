@@ -289,14 +289,19 @@ g_piy_done:	movem.l	(sp)+,a0-a1
 		
 
 grid_rand_gem:	jsr	rand		
-		and.b	#3,d0
+		and.l	#15,d0
+		lea	grid_randoms,a2
+		adda.l	d0,a2
+		cmp.b	#99,(a2)
+		beq	grid_rand_gem
+		move.b	(a2),d0
 		addq.b	#1,d0
 		rts
 
 
 
 
-grid_plr_spawn:	movem.l	d0/a0-a1,-(sp)
+grid_plr_spawn:	movem.l	d0/a0-a2,-(sp)
 		lea	grid,a0
 		adda.l	#3,a0
 		
@@ -327,7 +332,7 @@ grid_ps1:
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
 		
-grid_ps_done:	movem.l	(sp)+,d0/a0-a1
+grid_ps_done:	movem.l	(sp)+,d0/a0-a2
 		rts
 		
 
@@ -355,7 +360,7 @@ grid_spawn_chk:		; if stable and no matches then spawn
 gu_input:	; process player input if the grid is not stable
 		
 		moveq.l	#0,d0
-		; move.b	joy1,d0
+		move.b	joy1,d0
 		move.b	joy2,d0
 		
 		cmp.b	#0,grid_inpt_x
@@ -665,6 +670,9 @@ dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#3,d4
 		beq	dg_3
 		
+		cmp.b	#4,d4
+		beq	dg_4
+		
 		jsr	blue0
 		bra	dg_clear
 
@@ -674,7 +682,10 @@ dg_1:		jsr	red0
 dg_2:		jsr	yellow0
 		bra	dg_clear
 
-dg_3:		jsr	green0
+dg_3:		jsr	purple0
+		bra	dg_clear
+		
+dg_4:		jsr	green0
 		bra	dg_clear
 
 
@@ -691,14 +702,7 @@ dg_match:	; gems have been matched to do animations
 
 		and.b	#grid_type_mask,d4
 
-		; blue
-		cmp.b	#4,d4
-		bne	dgm_red
-		move.l	#blue_map,a3
-		jsr	grid_draw_gem
-		bra 	dg_clear
-		
-		
+
 dgm_red:	cmp.b	#1,d4
 		bne	dgm_yellow
 		move.l	#red_map,a3
@@ -706,17 +710,27 @@ dgm_red:	cmp.b	#1,d4
 		bra	dg_clear
 		
 dgm_yellow:	cmp.b	#2,d4
-		bne	dgm_green
+		bne	dgm_purple
 		move.l	#yellow_map,a3
 		jsr	grid_draw_gem
 		bra	dg_clear
 		
-dgm_green:	cmp.b	#3,d4
-		bne	dg_white
+dgm_purple:	cmp.b	#3,d4
+		bne	dgm_green
+		move.l	#purple_map,a3
+		jsr	grid_draw_gem
+		bra	dg_clear
+		
+dgm_green:	cmp.b	#4,d4
+		bne	dgm_blue
 		move.l	#green_map,a3
 		jsr	grid_draw_gem
 		bra	dg_clear
 				
+
+dgm_blue:	move.l	#blue_map,a3
+		jsr	grid_draw_gem
+		bra	dg_clear
 
 dg_white:	move.w	#$ffff,d1
 	
@@ -827,6 +841,8 @@ grid_i_speed	dc.l	8	; initial speed
 grid_x_speed	dc.b	2
 
 
+grid_randoms	dc.b	0,1,2,3,4,0,1,2,3,4,0,1,2,3,4,99
+
 	section bss
 		
 
@@ -857,3 +873,5 @@ grid_matched	ds.b	1
 grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
 grid_stable	ds.b	1
+
+	section	text
