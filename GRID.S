@@ -15,27 +15,28 @@ grid_dir_nw:	equ	(grid_w+1)
 grid_dir_w	equ	(1)
 
 ; masks, type is bits 0-2, flags are 3-8
-grid_type_mask:	equ	$7
-grid_flag_mask:	equ	$f8
+grid_type_mask:	equ	$7			; gem type mask
+grid_typep_mask:equ	$f			; type & player flag
+grid_xp_mask:	equ	$f7			; clear player flag
+grid_flag_mask:	equ	$f8			; gem flags mask
 
 ; flags
-grid_clr1_f:	equ	$8			; masks for the two
-grid_clr2_f:	equ	$10			; clear flags
+grid_plr_f:	equ	$8			; player gem flag
+grid_clr_f:	equ	$10			; 
 grid_match_f:	equ	$20			; mask for match flag
 grid_skip_f:	equ	$40			; skip flag - for now
 						; this is only set when
 						; a gem is falling down
 						; the screen.
 
-grid_fast_on:	equ	$0
-grid_fast_off:	equ	$ffffffff						
+grid_fast_on:	equ	$f
+grid_fast_off:	equ	0						
 
 grid_type_wild:	equ	7
 
 ; flag bit numbers
-grid_clr1_bit:	equ	3			; two flags because of
-grid_clr2_bit:	equ	4			; double buffering
-grid_clr12_bit:	equ	$18
+grid_plr_bit:	equ	3
+grid_clr_bit:	equ	4
 grid_match_bit:	equ	5
 grid_skip_bit:	equ	6
 
@@ -60,6 +61,7 @@ ig1:		move.b	#0,(a0)+
 		
 		move.b	#0,grid_matched
 		move.b	#1,grid_stable
+		move.b	#1,grid_spawn
 	
 		movem.l	(sp)+,d0/a0
 		rts
@@ -135,7 +137,7 @@ grid_plr_left:	movem.l	d0/a0-a1,-(sp)
 		move.b	grid_x_speed,grid_inpt_x
 		
 		move.b	(a1),(a1-1)		; move the gem
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 		subq.l	#1,grid_plr_a(a0)	; update player address		
 
 		cmp.b	#0,grid_plr_y(a0)	; don't update other gems
@@ -144,14 +146,14 @@ grid_plr_left:	movem.l	d0/a0-a1,-(sp)
 		
 		subq.l	#grid_w,a1		; move 2nd gem
 		move.b	(a1),(a1-1)
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 		
 		cmp.b	#1,grid_plr_y(a0)
 		beq	gpl_done
 		
 		subq.l	#grid_w,a1		; move 3rd gem
 		move.b	(a1),(a1-1)
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 		
 
 gpl_done:	movem.l	(sp)+,d0/a0-a1
@@ -175,7 +177,7 @@ grid_plr_right:	movem.l	d0/a0-a1,-(sp)
 		move.b	grid_x_speed,grid_inpt_x
 		
 		move.b	(a1),(a1+1)		; move the gem
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 		addq.l	#1,grid_plr_a(a0)	; update player address		
 
 		cmp.b	#0,grid_plr_y(a0)	; don't update other gems
@@ -184,14 +186,14 @@ grid_plr_right:	movem.l	d0/a0-a1,-(sp)
 		
 		subq.l	#grid_w,a1		; move 2nd gem
 		move.b	(a1),(a1+1)
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 		
 		cmp.b	#1,grid_plr_y(a0)
 		beq	gpr_done
 		
 		subq.l	#grid_w,a1		; move 3rd gem
 		move.b	(a1),(a1+1)
-		move.b	#grid_clr1_f,(a1)
+		move.b	#grid_clr_f,(a1)
 
 gpr_done:	movem.l	(sp)+,d0/a0-a1
 	
@@ -263,11 +265,21 @@ grid_rot_done:	movem.l	(sp)+,d1/a0-a1
 		
 		
 				
-grid_plr_inc_y:	movem.l	a0-a1,-(sp)		; only to be called
-		lea	grid_plr,a0		; when the grid is unstable
-		addq.b	#1,grid_plr_y(a0)
-		add.l	#grid_w,grid_plr_a(a0)
+grid_plr_inc_y:	movem.l	d0/a0-a1,-(sp)		
+		lea	grid_plr,a0		
 		
+		cmp.l	#16,grid_plr_y_off(a0)	; if offset >= 16 then inc
+		blt	g_piy_done		; otherwise skip
+		
+		sub.l	#16,grid_plr_y_off(a0)
+				
+		cmp.b	#1,grid_stable		; do nothing if stable
+		beq	g_piy_done		; waiting for offset to be >= 16
+
+		
+g_piy_inc:	addq.b	#1,grid_plr_y(a0)
+		add.l	#grid_w,grid_plr_a(a0)
+				
 		cmp.b	#2,grid_plr_y(a0)	; if we're on the 2nd or
 		bgt	g_piy_done		; or 3rd row fill in other gems
 		beq	g_piy_row3		; on row 3?
@@ -282,7 +294,7 @@ g_piy_row3:	move.l	grid_plr_a(a0),a1	; on row 3, fill in last gem
 		sub.l	#grid_w*2,a1
 		move.b	grid_plr_g3(a0),(a1)	
 		
-g_piy_done:	movem.l	(sp)+,a0-a1
+g_piy_done:	movem.l	(sp)+,d0/a0-a1
 		rts
 		
 		
@@ -302,36 +314,45 @@ grid_rand_gem:	jsr	rand
 
 
 grid_plr_spawn:	movem.l	d0/a0-a2,-(sp)
+
+
 		lea	grid,a0
+		move.l	#grid_c-1,d0
+grid_ps_loop:	and.b	#grid_xp_mask,(a0)+	; clear all player flags
+		dbf	d0,grid_ps_loop
+
+		lea	grid,a0			; find spawn pos
 		adda.l	#3,a0
 		
 		move.b	(a0),d0
-		and.b	#grid_type_mask,d0
+		and.b	#grid_type_mask,d0	; check spawn slot
 		cmp.b	#0,d0
 		beq	grid_ps1
 		
-		; square is occupied, therefore DEAD
-		jsr	game_over
-		bra	grid_ps_done
-		
+		jsr	game_over		; occupied, therefore DEAD
+		bra	grid_ps_done		
 
-grid_ps1:
-		lea	grid_plr,a1
+grid_ps1:	lea	grid_plr,a1
 		move.b	#3,grid_plr_x(a1)	; player base x, y
 		move.b	#0,grid_plr_y(a1)
 		move.l	a0,grid_plr_a(a1)	; address of base gem
+		move.l	#15,grid_plr_y_off(a1)	; offset to 0
 		
 		jsr	grid_rand_gem
+		or.b	#grid_plr_f,d0
 		move.b	d0,(a0)			; update the grid
 		
 		jsr	grid_rand_gem		; store the two that will
+		or.b	#grid_plr_f,d0
 		move.b	d0,grid_plr_g2(a1)	; appear next so the player
 		jsr	grid_rand_gem		; can still rotate through
+		or.b	#grid_plr_f,d0
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
 	
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
-		
+		move.b	#0,grid_spawn
+				
 grid_ps_done:	movem.l	(sp)+,d0/a0-a2
 		rts
 		
@@ -344,16 +365,13 @@ grid_update:	movem.l	d0-d6/a0-a3,-(sp)
 		cmp.l	#10,grid_match_c
 		blt	grid_spawn_chk
 		sub.l	#10,grid_match_c
-		cmp.l	#0,grid_speed
-		beq	grid_spawn_chk
-		subq.l	#1,grid_speed
+		cmp.l	#16,grid_speed
+		bge	grid_spawn_chk
+		addq.l	#1,grid_speed
 
-grid_spawn_chk:		; if stable and no matches then spawn
-		cmp.b	#1,grid_stable
+grid_spawn_chk:	; if stable and no matches then spawn
+		cmp.b	#1,grid_spawn
 		bne	gu_input
-		
-		cmp.b	#1,grid_matched
-		beq	gu_input_done
 		jsr	grid_plr_spawn
 				
 		
@@ -386,9 +404,11 @@ gu_input_up:	btst	#0,d0
 		
 gu_input_crot:	move.b	#0,grid_inpt_rot
 		
-gu_input_down:	btst	#1,d0
+gu_input_down:	btst	#1,d0				; drop gems
 		beq	gu_input_done
 		move.l	#grid_fast_on,grid_fast
+		lea	grid_plr,a0
+		move.l	#0,grid_plr_y_off(a0)
 		
 gu_input_done:	; don't do any updates while the timer
 		; is counting down
@@ -406,9 +426,11 @@ gu_input_done:	; don't do any updates while the timer
 		cmp.l	#0,d0
 		bne	gu_done
 		
-		move.l	grid_speed,d0
-		and.l	grid_fast,d0
-		move.l	d0,grid_timer
+;		move.l	grid_speed,d0
+;		and.l	grid_fast,d0
+;		move.l	d0,grid_timer
+		move.l	#0,grid_timer
+;DISABLED TIMER
 
 
 gu_init:	; pre-processing before the main update
@@ -419,24 +441,34 @@ gu_init:	; pre-processing before the main update
 		lea	grid,a0
 		move.l	#grid_c-1,d0
 		
-		move.b	#1,grid_stable		; reset stable flag
-
 gu_init_loop:	btst	#grid_match_bit,(a0)	; check for match
 		beq	gu_init_clear		
-		move.b	#grid_clr1_f,(a0)+	; found, set clear
+		move.b	#grid_clr_f,(a0)+	; found, set clear
 		dbf	d0,gu_init_loop
 		bra	gu_init_done
 		
-gu_init_clear:	and.b	#grid_type_mask,(a0)+	; clear old flags
-gu_init_skip:	dbf	d0,gu_init_loop
+gu_init_clear:	and.b	#grid_typep_mask,(a0)+	; clear flags except for
+		dbf	d0,gu_init_loop		; player flag
+		bra	gu_init_done
+
+gu_init_skip:	dbf	d0,gu_init_loop		
 
 
 		; start at end of grid (bottom of screen)
 		; and move values down, flagging squares
 		; that need to be cleared when drawing
-gu_init_done:	lea	grid,a0
+gu_init_done:	
+		move.b	#1,grid_stable		; reset stable flag
+
+		lea	grid,a0
 		adda.l	#grid_c-1,a0
 		move.l	#grid_w*(grid_h-1)-1,d0
+		
+		lea	grid_plr,a2		; update player offset
+		move.l	grid_plr_y_off(a2),d5	
+		add.l	grid_speed,d5
+		add.l	grid_fast,d5
+		move.l	d5,grid_plr_y_off(a2)
 
 
 gu_loop:	moveq.l	#0,d3
@@ -451,28 +483,51 @@ gu_loop:	moveq.l	#0,d3
 
 		moveq.l	#0,d4
 		move.b	(a1),d4
-		and.b	#grid_type_mask,d4	; type of above in d4
+		
+		btst	#grid_plr_bit,d4	; is gem above a player
+		beq	gu_l1			; gem?
+		
+		cmp.l	#16,d5			; yes, so check yoff
+		blt	gu_l2			; < 16 so skip
+						; (but still unstable)
+						
+gu_l1:		and.b	#grid_type_mask,d4	; type of above in d4
 
 		cmp.b	#0,d4
 		beq	gu_skip			; empty above, no-op
 
-		move.b	d4,(a0)			; else move the type down
-		move.b	#0,grid_stable		; clear stable flag		
-		move.b	#grid_clr1_f,(a1)	; and set above to 0
+		move.b	(a1),d4
+		and.b	#grid_typep_mask,d4	; else move the gem down
+		move.b	d4,(a0)			; with the player flag bit
+		move.b	#grid_clr_f,(a1)	; and set above to 0
+		
+gu_l2:		move.b	#0,grid_stable		; clear stable flag
 		
 gu_skip:	
 		suba.l	#1,a0
 		dbf	d0,gu_loop
 		
-		cmp.b	#1,grid_stable		; if the grid stable run matches
+		lea	grid_plr,a0		; see if player gems have dropped
+		cmp.l	#16,grid_plr_y_off(a0)	
+		blt	gu_done			; nope, do nothing else
+				
+		cmp.b	#1,grid_stable		; if the grid is stable
 		bne	gu_unstable
-		jsr	grid_matches
-		jmp	gu_done		
-
-gu_unstable:	cmp.b	#1,grid_matched		; if unstable and  matched
-		beq	gu_done			; then we're done
+				
+		jsr	grid_matches		; check for matches
+		move.l	#0,grid_plr_y_off(a0)	; clear the player offset
 		
-		jsr	grid_plr_inc_y		; otherwise increment player y		
+		lea	grid,a0			; stable so 
+		move.l	#grid_c-1,d0		; clear all player flags
+gu_s_loop:	and.b	#grid_xp_mask,(a0)+	
+		dbf	d0,gu_s_loop
+		
+		
+		cmp.b	#1,grid_matched		; stable, but no matches so spawn
+		beq	gu_done
+		move.b	#1,grid_spawn
+		
+gu_unstable:	jsr	grid_plr_inc_y		; otherwise increment player y		
 
 gu_done:	
 		movem.l (sp)+,d0-d6/a0-a3
@@ -523,7 +578,7 @@ gm_start:	lea	grid,a0
 
 gm_loop:	move.b	(a0),d3
 
-		btst	#grid_clr1_bit,d3	; flagged as clear?
+		btst	#grid_clr_bit,d3	; flagged as clear?
 		bne	gm_skip
 		
 		and.b	#grid_type_mask,d3
@@ -571,7 +626,7 @@ gm_noinc:
 		; set the timer to run whether there was a match
 		; or not so there's a gap before the player's
 		; next gems drop.
-		move.l	grid_speed,grid_timer
+		move.l	#8,grid_timer
 		cmp.b	#1,grid_matched
 		bne	match_skip
 		addq.l	#8,grid_timer
@@ -627,7 +682,17 @@ gc3_noop:	movem.l	(sp)+,d0/d6/a0-a2
 
 grid_draw:	; draw fixed gems to screen
 		movem.l	d0-d7/a0-a3,-(sp)
-
+		
+		lea	grid_plr,a2
+		moveq.l	#0,d0
+		move.l	grid_plr_y_off(a2),d0
+		move.l	d0,d5
+		movea.l	screen_adr,a0
+		adda.l	#scr_w*16*2,a0
+		jsr	font_digit
+		
+		
+		
 		lea	grid,a2
 		
 		movea.l	screen_adr,a1		; start of grid in buffer
@@ -640,27 +705,35 @@ grid_draw:	; draw fixed gems to screen
 
 
 dg1:
-		move.b	(a2),d4			; get type in d4
+		move.b	(a2),d4			; get gem in d4
 
-		btst	#grid_clr1_bit,d4	; need to clear?
+		btst	#grid_clr_bit,d4	; need to clear?
 		bne	dg_bg
-		
-		move.l	ticks,d5
-		;and.l	#4,d5
-		;beq	dg_type
-		
+				
 		btst	#grid_match_bit,d4	; matched?
 		bne	dg_match
+		
+		movea.l	a1,a0
+		jsr	dg_drawbg
+		movea.l	a1,a0
+
+		btst	#grid_plr_bit,d4	; player gem? add offset	
+		beq	dg_type			; gem is offset from above
+						; unless the grid is stable
+						; and then draw where they are
+		cmp.l	#1,grid_stable
+		beq	dg_type			
+		
+		suba.l	#scr_w*2*16,a0		; > 0 so do offset
+		move.l	d5,d6
+		mulu.l	#scr_w*2,d6		
+		adda.l	d6,a0
 		
 dg_type:	and.b	#grid_type_mask,d4
 
 		cmp.b	#0,d4			; zero, so skip
 		beq	dg_bg ; temp - draw bg to clear everything
-		
-		movea.l	a1,a0
-		jsr	dg_drawbg
-		movea.l	a1,a0
-		
+				
 		cmp.b	#1,d4			; render gem		
 		beq	dg_1
 	
@@ -837,7 +910,7 @@ gdg1:		lsl	#2,d0
 
 	section	data
 
-grid_i_speed	dc.l	8	; initial speed
+grid_i_speed	dc.l	1	; initial speed
 grid_x_speed	dc.b	2
 
 
@@ -846,9 +919,10 @@ grid_randoms	dc.b	0,1,2,3,4,0,1,2,3,4,0,1,2,3,4,99
 	section bss
 		
 
-grid_plr_s	equ	8
+grid_plr_s	equ	12
 		
 		rsreset
+grid_plr_y_off	rs.l	1	; current-y-offset (change to byte?)
 grid_plr_x	rs.b	1	; coords of bottom gem
 grid_plr_y	rs.b	1
 grid_plr_g2	rs.b	1	; 2nd and 3rd gem generated on spawn
@@ -868,6 +942,7 @@ grid_fast	ds.l	1
 grid_match_c	ds.l	1
 
 
+grid_spawn	ds.b	1
 grid_matched	ds.b	1
 
 grid_timer	ds.l	1
