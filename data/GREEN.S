@@ -1,7 +1,4 @@
 		section text
-
-green_map:	dc.l	green0,green1,green2,green3,green4,green5,green6,green7
-
 green0:
 		adda.l	#12+(scr_w-16)*0,a0
 		move.l	#$228515A9,(a0)+
@@ -128,19 +125,19 @@ green0:
 		section text
 green1:
 		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.l	#$1B682245,(a0)+
+		move.l	#$22851407,(a0)+
+		move.l	#$12A62245,(a0)+
 		adda.l	#22+(scr_w-16)*2,a0
 		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
-		move.l	#$42EA14C9,(a0)+
+		move.l	#$0CA60345,(a0)+
+		move.l	#$218514C9,(a0)+
 		move.w	#$2265,(a0)+
 		adda.l	#10+(scr_w-16)*2,a0
 		move.l	#$22052205,(a0)+
 		move.l	#$22052225,(a0)+
 		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
-		move.l	#$22A73AA9,(a0)+
+		move.l	#$05860242,(a0)+
+		move.l	#$09023AA9,(a0)+
 		move.l	#$068C22C6,(a0)+
 		move.l	#$22052205,(a0)+
 		move.l	#$22052205,(a0)+
@@ -148,8 +145,8 @@ green1:
 		move.l	#$260C2E2D,(a0)+
 		move.l	#$364E364E,(a0)+
 		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		move.l	#$22462267,(a0)+
+		move.l	#$05A602C3,(a0)+
+		move.l	#$11232267,(a0)+
 		move.l	#$1ECF068C,(a0)+
 		move.l	#$6F765EF4,(a0)+
 		move.l	#$67152E2D,(a0)+
@@ -157,8 +154,8 @@ green1:
 		move.l	#$1568062A,(a0)+
 		move.l	#$0629066A,(a0)+
 		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
-		move.l	#$22660C87,(a0)+
+		move.l	#$060801C3,(a0)+
+		move.l	#$08C20C87,(a0)+
 		move.l	#$066B068C,(a0)+
 		move.l	#$06AD06AE,(a0)+
 		move.l	#$164B0D47,(a0)+
@@ -166,8 +163,8 @@ green1:
 		move.l	#$22850CA6,(a0)+
 		move.l	#$05440564,(a0)+
 		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
-		move.l	#$22242245,(a0)+
+		move.l	#$05A60282,(a0)+
+		move.l	#$11022245,(a0)+
 		move.l	#$05460608,(a0)+
 		move.l	#$05850544,(a0)+
 		move.l	#$0CA62285,(a0)+
@@ -175,16 +172,16 @@ green1:
 		move.w	#$2265,(a0)+
 		move.l	#$0CA60544,(a0)+
 		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		move.l	#$22040BC3,(a0)+
+		move.l	#$05C60382,(a0)+
+		move.l	#$11020B63,(a0)+
 		move.l	#$05250564,(a0)+
 		move.l	#$05440C65,(a0)+
 		move.w	#$2265,(a0)+
 		adda.l	#6+(scr_w-16)*2,a0
 		move.l	#$22850D26,(a0)+
 		move.l	#$056405A5,(a0)+
-		move.l	#$068C05E9,(a0)+
-		move.l	#$1B460422,(a0)+
+		move.l	#$068C04A7,(a0)+
+		move.l	#$12840422,(a0)+
 		move.l	#$05640585,(a0)+
 		move.l	#$0D262285,(a0)+
 		adda.l	#8+(scr_w-16)*2,a0
@@ -251,52 +248,58 @@ green1:
 
 		section text
 green2:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.w	#$0041,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		adda.l	#64+(scr_w-16)*4,a0
 		move.l	#$22052205,(a0)+
 		move.l	#$22052225,(a0)+
-		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$22A52205,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		move.l	#$22052205,(a0)+
+		move.l	#$22052205,(a0)+
+		move.l	#$22052205,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$260C2E2D,(a0)+
 		move.l	#$364E364E,(a0)+
-		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$262B04A6,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		move.l	#$1ECF068C,(a0)+
+		move.l	#$6F765EF4,(a0)+
+		move.l	#$67152E2D,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$1568062A,(a0)+
 		move.l	#$0629066A,(a0)+
 		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
-		adda.l	#14+(scr_w-16)*0,a0
-		move.w	#$1AC5,(a0)+
+		move.w	#$2205,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		move.w	#$2205,(a0)+
+		move.l	#$066B068C,(a0)+
+		move.l	#$06AD06AE,(a0)+
+		move.l	#$164B0D47,(a0)+
 		adda.l	#(scr_w-16)*2,a0
 		move.l	#$22850CA6,(a0)+
 		move.l	#$05440564,(a0)+
 		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
-		adda.l	#8+(scr_w-16)*0,a0
-		move.l	#$22451AA5,(a0)+
-		move.l	#$13A52265,(a0)+
+		move.w	#$04C5,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		move.w	#$1A04,(a0)+
+		move.l	#$05460608,(a0)+
+		move.l	#$05850544,(a0)+
+		move.l	#$0CA62285,(a0)+
 		adda.l	#2+(scr_w-16)*2,a0
 		move.w	#$2265,(a0)+
 		move.l	#$0CA60544,(a0)+
 		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		adda.l	#6+(scr_w-16)*0,a0
-		move.w	#$1B25,(a0)+
-		move.l	#$13E40C65,(a0)+
+		move.w	#$0485,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		move.w	#$0AE3,(a0)+
+		move.l	#$05250564,(a0)+
+		move.l	#$05440C65,(a0)+
 		move.w	#$2265,(a0)+
 		adda.l	#6+(scr_w-16)*2,a0
 		move.l	#$22850D26,(a0)+
 		move.l	#$056405A5,(a0)+
-		move.l	#$068C05E9,(a0)+
-		move.l	#$22251A64,(a0)+
-		move.l	#$0C840545,(a0)+
+		move.l	#$068C2205,(a0)+
+		move.l	#$220503C1,(a0)+
+		move.l	#$05640585,(a0)+
 		move.l	#$0D262285,(a0)+
 		adda.l	#8+(scr_w-16)*2,a0
 		move.l	#$228504C5,(a0)+
@@ -362,77 +365,85 @@ green2:
 
 		section text
 green3:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.w	#$21C5,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		adda.l	#64+(scr_w-16)*4,a0
 		move.l	#$22052205,(a0)+
-		move.l	#$22052225,(a0)+
-		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		adda.l	#22+(scr_w-16)*0,a0
+		move.w	#$2205,(a0)+
+		move.l	#$22052205,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$260C2E2D,(a0)+
-		move.l	#$364E364E,(a0)+
-		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		move.w	#$21A5,(a0)+
-		adda.l	#14+(scr_w-16)*2,a0
+		move.l	#$364E2205,(a0)+
+		adda.l	#16+(scr_w-16)*0,a0
+		move.l	#$22055672,(a0)+
+		move.l	#$67152E2D,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$1568062A,(a0)+
 		move.l	#$0629066A,(a0)+
-		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.w	#$2205,(a0)+
+		adda.l	#12+(scr_w-16)*0,a0
+		move.w	#$2205,(a0)+
+		move.l	#$06AD06AE,(a0)+
+		move.l	#$164B0D47,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$22850CA6,(a0)+
 		move.l	#$05440564,(a0)+
-		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$29452265,(a0)+
+		move.l	#$05A62205,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		move.l	#$22050608,(a0)+
+		move.l	#$05850544,(a0)+
+		move.l	#$0CA62285,(a0)+
+		adda.l	#2+(scr_w-16)*2,a0
+		move.w	#$2265,(a0)+
 		move.l	#$0CA60544,(a0)+
 		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$29452945,(a0)+
+		move.w	#$2205,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		move.w	#$2205,(a0)+
+		move.l	#$05250564,(a0)+
+		move.l	#$05440C65,(a0)+
+		move.w	#$2265,(a0)+
+		adda.l	#6+(scr_w-16)*2,a0
 		move.l	#$22850D26,(a0)+
 		move.l	#$056405A5,(a0)+
-		move.l	#$068C05E9,(a0)+
-		move.l	#$21A510C2,(a0)+
-		adda.l	#12+(scr_w-16)*2,a0
-		move.l	#$29452945,(a0)+
+		move.l	#$05292205,(a0)+
+		move.l	#$22050361,(a0)+
+		move.l	#$05640585,(a0)+
+		move.l	#$0D262285,(a0)+
+		adda.l	#8+(scr_w-16)*2,a0
 		move.l	#$228504C5,(a0)+
 		move.l	#$05640565,(a0)+
 		move.l	#$97FA064A,(a0)+
-		move.w	#$1426,(a0)+
-		adda.l	#2+(scr_w-16)*0,a0
-		move.w	#$10C2,(a0)+
-		adda.l	#10+(scr_w-16)*2,a0
-		move.l	#$29452265,(a0)+
+		move.l	#$05A604C2,(a0)+
+		move.l	#$05E706CE,(a0)+
+		move.l	#$1DCA2285,(a0)+
+		adda.l	#6+(scr_w-16)*2,a0
+		move.w	#$2265,(a0)+
 		move.l	#$0C4404E3,(a0)+
 		move.l	#$05030564,(a0)+
 		move.l	#$068C97FA,(a0)+
-		move.l	#$06290504,(a0)+
-		adda.l	#2+(scr_w-16)*0,a0
-		move.w	#$10C2,(a0)+
-		adda.l	#8+(scr_w-16)*2,a0
+		move.l	#$06290544,(a0)+
+		move.l	#$0585064A,(a0)+
+		move.l	#$1ECF360D,(a0)+
+		move.w	#$2265,(a0)+
+		adda.l	#2+(scr_w-16)*2,a0
 		move.l	#$22850C24,(a0)+
 		move.l	#$04C304E3,(a0)+
 		move.l	#$05440503,(a0)+
 		move.l	#$056405A6,(a0)+
 		move.l	#$05C60564,(a0)+
-		move.l	#$056413C5,(a0)+
-		move.w	#$1924,(a0)+
-		adda.l	#6+(scr_w-16)*2,a0
+		move.l	#$056405A6,(a0)+
+		move.l	#$06081ECF,(a0)+
+		move.l	#$2DAB2285,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$044304A2,(a0)+
 		move.l	#$04620462,(a0)+
 		move.l	#$04A204C2,(a0)+
 		move.l	#$056405A6,(a0)+
 		move.l	#$05A60564,(a0)+
 		move.l	#$04C204E3,(a0)+
-		move.l	#$0CA41924,(a0)+
-		adda.l	#4+(scr_w-16)*2,a0
+		move.l	#$05440544,(a0)+
+		move.l	#$1ECF0D26,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$04230403,(a0)+
 		move.l	#$03E203C2,(a0)+
 		move.l	#$03A204E3,(a0)+
@@ -440,8 +451,8 @@ green3:
 		move.l	#$05A60564,(a0)+
 		move.l	#$04C30443,(a0)+
 		move.l	#$0C840CA5,(a0)+
-		move.w	#$1B05,(a0)+
-		adda.l	#2+(scr_w-16)*2,a0
+		move.l	#$0CE60D06,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$22052205,(a0)+
 		move.l	#$22052205,(a0)+
 		move.l	#$22850BE3,(a0)+
@@ -449,7 +460,7 @@ green3:
 		move.l	#$05850544,(a0)+
 		move.l	#$0CA62285,(a0)+
 		move.l	#$22052205,(a0)+
-		move.l	#$220521E5,(a0)+
+		move.l	#$22052205,(a0)+
 		adda.l	#10+(scr_w-16)*2,a0
 		move.w	#$2265,(a0)+
 		move.l	#$03E304E3,(a0)+
@@ -462,191 +473,185 @@ green3:
 
 		section text
 green4:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.w	#$10C3,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$22052205,(a0)+
-		move.l	#$22052225,(a0)+
-		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$260C2E2D,(a0)+
-		move.l	#$364E364E,(a0)+
-		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$1568062A,(a0)+
-		move.l	#$0629066A,(a0)+
-		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$22850CA6,(a0)+
-		move.l	#$05440564,(a0)+
-		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60544,(a0)+
-		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
+		adda.l	#228+(scr_w-16)*14,a0
 		move.l	#$22850D26,(a0)+
-		move.l	#$056405A5,(a0)+
-		move.l	#$068C0D69,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
+		move.l	#$04E42285,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		move.l	#$022202C3,(a0)+
+		move.l	#$0D262285,(a0)+
+		adda.l	#8+(scr_w-16)*2,a0
 		move.l	#$228504C5,(a0)+
 		move.l	#$05640565,(a0)+
-		move.l	#$97FA1468,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
+		move.l	#$76340447,(a0)+
+		move.l	#$046504C2,(a0)+
+		move.l	#$05E706CE,(a0)+
+		move.l	#$1DCA2285,(a0)+
+		adda.l	#6+(scr_w-16)*2,a0
 		move.w	#$2265,(a0)+
 		move.l	#$0C4404E3,(a0)+
 		move.l	#$05030564,(a0)+
-		move.l	#$068C7614,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$068C97FA,(a0)+
+		move.l	#$06290544,(a0)+
+		move.l	#$0585064A,(a0)+
+		move.l	#$1ECF360D,(a0)+
+		move.w	#$2265,(a0)+
+		adda.l	#2+(scr_w-16)*2,a0
 		move.l	#$22850C24,(a0)+
 		move.l	#$04C304E3,(a0)+
 		move.l	#$05440503,(a0)+
-		move.l	#$056413E5,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$056405A6,(a0)+
+		move.l	#$05C60564,(a0)+
+		move.l	#$056405A6,(a0)+
+		move.l	#$06081ECF,(a0)+
+		move.l	#$2DAB2285,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$044304A2,(a0)+
 		move.l	#$04620462,(a0)+
 		move.l	#$04A204C2,(a0)+
-		move.l	#$056413E5,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$056405A6,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C204E3,(a0)+
+		move.l	#$05440544,(a0)+
+		move.l	#$1ECF0D26,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$04230403,(a0)+
 		move.l	#$03E203C2,(a0)+
 		move.l	#$03A204E3,(a0)+
-		move.l	#$05441405,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
+		move.l	#$05440564,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C30443,(a0)+
+		move.l	#$0C840CA5,(a0)+
+		move.l	#$0CE60D06,(a0)+
+		adda.l	#(scr_w-16)*2,a0
 		move.l	#$22052205,(a0)+
 		move.l	#$22052205,(a0)+
 		move.l	#$22850BE3,(a0)+
-		move.l	#$04E31404,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
+		move.l	#$04E30564,(a0)+
+		move.l	#$05850544,(a0)+
+		move.l	#$0CA62285,(a0)+
+		move.l	#$22052205,(a0)+
+		move.l	#$22052205,(a0)+
+		adda.l	#10+(scr_w-16)*2,a0
 		move.w	#$2265,(a0)+
-		move.l	#$03E30C23,(a0)+
-		adda.l	#28+(scr_w-16)*2,a0
-		move.l	#$22851CC8,(a0)+
+		move.l	#$03E304E3,(a0)+
+		move.l	#$05240C65,(a0)+
+		move.w	#$2265,(a0)+
+		adda.l	#22+(scr_w-16)*2,a0
+		move.l	#$228515A9,(a0)+
+		move.l	#$064C22A5,(a0)+
 		rts
 
 		section text
 green5:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.w	#$10C3,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$22052205,(a0)+
-		move.l	#$22052225,(a0)+
-		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$260C2E2D,(a0)+
-		move.l	#$364E364E,(a0)+
-		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$1568062A,(a0)+
-		move.l	#$0629066A,(a0)+
-		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$22850CA6,(a0)+
-		move.l	#$05440564,(a0)+
-		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60544,(a0)+
-		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		move.l	#$22850D26,(a0)+
-		move.l	#$056405A5,(a0)+
-		move.l	#$068C0D69,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		move.l	#$228504C5,(a0)+
-		move.l	#$05640565,(a0)+
-		move.l	#$97FA1AC6,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0C4404E3,(a0)+
-		move.l	#$05030CC4,(a0)+
-		move.w	#$21C5,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		move.l	#$22850C24,(a0)+
-		move.l	#$04C30C43,(a0)+
-		move.w	#$21E5,(a0)+
+		adda.l	#270+(scr_w-16)*16,a0
+		move.w	#$2205,(a0)+
+		move.w	#$2205,(a0)+
 		adda.l	#22+(scr_w-16)*2,a0
-		move.l	#$04430442,(a0)+
-		move.w	#$21A4,(a0)+
+		move.l	#$22050222,(a0)+
+		move.l	#$052997FA,(a0)+
+		move.l	#$06290544,(a0)+
+		move.l	#$04442205,(a0)+
+		adda.l	#12+(scr_w-16)*2,a0
+		move.l	#$220503C2,(a0)+
+		move.l	#$05440503,(a0)+
+		move.l	#$056405A6,(a0)+
+		move.l	#$05C60564,(a0)+
+		move.l	#$056405A6,(a0)+
+		move.l	#$06080A85,(a0)+
+		adda.l	#4+(scr_w-16)*2,a0
+		move.l	#$02A204A2,(a0)+
+		move.l	#$04620462,(a0)+
+		move.l	#$04A204C2,(a0)+
+		move.l	#$056405A6,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C204E3,(a0)+
+		move.l	#$05440544,(a0)+
+		move.l	#$1ECF0202,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		move.l	#$04230403,(a0)+
+		move.l	#$03E203C2,(a0)+
+		move.l	#$03A204E3,(a0)+
+		move.l	#$05440564,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C30443,(a0)+
+		move.l	#$0C840CA5,(a0)+
+		move.l	#$0CE60D06,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		move.l	#$22052205,(a0)+
+		move.l	#$22052205,(a0)+
+		move.l	#$22850BE3,(a0)+
+		move.l	#$04E30564,(a0)+
+		move.l	#$05850544,(a0)+
+		move.l	#$0CA62285,(a0)+
+		move.l	#$22052205,(a0)+
+		move.l	#$22052205,(a0)+
+		adda.l	#10+(scr_w-16)*2,a0
+		move.w	#$2265,(a0)+
+		move.l	#$03E304E3,(a0)+
+		move.l	#$05240C65,(a0)+
+		move.w	#$2265,(a0)+
+		adda.l	#22+(scr_w-16)*2,a0
+		move.l	#$228515A9,(a0)+
+		move.l	#$064C22A5,(a0)+
 		rts
 
 		section text
 green6:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22851549,(a0)+
-		move.w	#$10C3,(a0)+
+		adda.l	#302+(scr_w-16)*18,a0
+		move.w	#$5CF0,(a0)+
+		move.l	#$06292205,(a0)+
 		adda.l	#24+(scr_w-16)*2,a0
-		move.w	#$2265,(a0)+
-		move.l	#$0CA60E4A,(a0)+
+		move.l	#$03E305A6,(a0)+
+		move.l	#$05C60564,(a0)+
+		move.w	#$2205,(a0)+
+		adda.l	#20+(scr_w-16)*2,a0
+		move.w	#$0462,(a0)+
+		move.l	#$056405A6,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C22205,(a0)+
 		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$22052205,(a0)+
-		move.l	#$22052225,(a0)+
-		move.l	#$22A50CA6,(a0)+
-		move.l	#$058605A6,(a0)+
+		move.l	#$030104E3,(a0)+
+		move.l	#$05440564,(a0)+
+		move.l	#$05A60564,(a0)+
+		move.l	#$04C303E3,(a0)+
 		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$260C2E2D,(a0)+
-		move.l	#$364E364E,(a0)+
-		move.l	#$262B0DE8,(a0)+
-		move.l	#$05A605A6,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		move.l	#$1568062A,(a0)+
-		move.l	#$0629066A,(a0)+
-		move.l	#$068B05C6,(a0)+
-		move.l	#$060805C9,(a0)+
+		move.l	#$22850BE3,(a0)+
+		move.l	#$04E30564,(a0)+
+		move.l	#$05850544,(a0)+
+		move.l	#$0CA62285,(a0)+
 		adda.l	#18+(scr_w-16)*2,a0
-		move.w	#$1B05,(a0)+
-		move.l	#$05040564,(a0)+
-		move.l	#$05A605E7,(a0)+
-		move.l	#$05A60504,(a0)+
+		move.w	#$2265,(a0)+
+		move.l	#$03E304E3,(a0)+
+		move.l	#$05240C65,(a0)+
+		move.w	#$2265,(a0)+
 		adda.l	#22+(scr_w-16)*2,a0
-		move.w	#$1A85,(a0)+
-		move.l	#$05640585,(a0)+
-		move.l	#$05C60483,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
-		move.w	#$21C5,(a0)+
-		move.l	#$0D4A0D69,(a0)+
+		move.l	#$228515A9,(a0)+
+		move.l	#$064C22A5,(a0)+
 		rts
 
 		section text
 green7:
-		adda.l	#12+(scr_w-16)*0,a0
-		move.l	#$22051BE7,(a0)+
-		move.w	#$10C3,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
-		move.l	#$21E51B07,(a0)+
+		adda.l	#334+(scr_w-16)*20,a0
+		move.w	#$2205,(a0)+
+		move.w	#$2205,(a0)+
 		adda.l	#28+(scr_w-16)*2,a0
-		move.l	#$21C513C5,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		move.w	#$13C5,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		move.w	#$13A7,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		move.w	#$1AA5,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		move.w	#$1923,(a0)+
+		move.w	#$0424,(a0)+
+		move.w	#$0424,(a0)+
+		adda.l	#28+(scr_w-16)*2,a0
+		move.w	#$0564,(a0)+
+		move.l	#$05452205,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		move.l	#$22050564,(a0)+
+		move.l	#$058502E2,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		move.l	#$02E204E3,(a0)+
+		move.l	#$05240B64,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		move.l	#$228515A9,(a0)+
+		move.l	#$064C22A5,(a0)+
 		rts
 
-		section text
-green8:
-		rts
+green_map:	dc.l	green0,green1,green2,green3,green4,green5,green6,green7
 
 		section text
 green0clear:
@@ -930,38 +935,8 @@ green1clear:
 
 		section text
 green2clear:
-		adda.l	#12+(scr_w-16)*0,a0
-		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
-		move.w	(a1)+,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		adda.l	#24+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#14+(scr_w-16)*0,a0
-		adda.l	#14+(scr_w-16)*0,a1
-		move.w	(a1)+,(a0)+
-		adda.l	#(scr_w-16)*2,a0
-		adda.l	#(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#64+(scr_w-16)*4,a0
+		adda.l	#64+(scr_w-16)*4,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
@@ -969,15 +944,51 @@ green2clear:
 		adda.l	#8+(scr_w-16)*0,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		adda.l	#8+(scr_w-16)*0,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		adda.l	#4+(scr_w-16)*0,a1
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		adda.l	#4+(scr_w-16)*0,a1
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		adda.l	#2+(scr_w-16)*2,a0
 		adda.l	#2+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#6+(scr_w-16)*0,a0
-		adda.l	#6+(scr_w-16)*0,a1
 		move.w	(a1)+,(a0)+
+		adda.l	#4+(scr_w-16)*0,a0
+		adda.l	#4+(scr_w-16)*0,a1
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
 		adda.l	#6+(scr_w-16)*2,a0
@@ -1060,78 +1071,50 @@ green2clear:
 
 		section text
 green3clear:
+		adda.l	#64+(scr_w-16)*4,a0
+		adda.l	#64+(scr_w-16)*4,a1
+		move.l	(a1)+,(a0)+
+		adda.l	#22+(scr_w-16)*0,a0
+		adda.l	#22+(scr_w-16)*0,a1
+		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#16+(scr_w-16)*0,a0
+		adda.l	#16+(scr_w-16)*0,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
 		adda.l	#12+(scr_w-16)*0,a0
 		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
-		move.w	(a1)+,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		adda.l	#24+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		adda.l	#8+(scr_w-16)*0,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
+		adda.l	#2+(scr_w-16)*2,a0
+		adda.l	#2+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
-		adda.l	#14+(scr_w-16)*2,a0
-		adda.l	#14+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#12+(scr_w-16)*2,a0
-		adda.l	#12+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
-		adda.l	#2+(scr_w-16)*0,a0
-		adda.l	#2+(scr_w-16)*0,a1
+		adda.l	#4+(scr_w-16)*0,a0
+		adda.l	#4+(scr_w-16)*0,a1
 		move.w	(a1)+,(a0)+
-		adda.l	#10+(scr_w-16)*2,a0
-		adda.l	#10+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#2+(scr_w-16)*0,a0
-		adda.l	#2+(scr_w-16)*0,a1
-		move.w	(a1)+,(a0)+
-		adda.l	#8+(scr_w-16)*2,a0
-		adda.l	#8+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
@@ -1143,10 +1126,17 @@ green3clear:
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
+		adda.l	#8+(scr_w-16)*2,a0
+		adda.l	#8+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
-		adda.l	#4+(scr_w-16)*2,a0
-		adda.l	#4+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#6+(scr_w-16)*2,a0
+		adda.l	#6+(scr_w-16)*2,a1
+		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
@@ -1156,6 +1146,36 @@ green3clear:
 		move.w	(a1)+,(a0)+
 		adda.l	#2+(scr_w-16)*2,a0
 		adda.l	#2+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
@@ -1178,173 +1198,160 @@ green3clear:
 
 		section text
 green4clear:
-		adda.l	#12+(scr_w-16)*0,a0
-		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
-		move.w	(a1)+,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		adda.l	#24+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		adda.l	#228+(scr_w-16)*14,a0
+		adda.l	#228+(scr_w-16)*14,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
+		adda.l	#8+(scr_w-16)*0,a0
+		adda.l	#8+(scr_w-16)*0,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		adda.l	#8+(scr_w-16)*2,a0
+		adda.l	#8+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		adda.l	#18+(scr_w-16)*2,a1
+		adda.l	#6+(scr_w-16)*2,a0
+		adda.l	#6+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		adda.l	#20+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		adda.l	#20+(scr_w-16)*2,a1
+		move.w	(a1)+,(a0)+
+		adda.l	#2+(scr_w-16)*2,a0
+		adda.l	#2+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		adda.l	#18+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#10+(scr_w-16)*2,a0
+		adda.l	#10+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
-		adda.l	#26+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
+		adda.l	#22+(scr_w-16)*2,a0
+		adda.l	#22+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
-		adda.l	#28+(scr_w-16)*2,a0
-		adda.l	#28+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		rts
 
 		section text
 green5clear:
-		adda.l	#12+(scr_w-16)*0,a0
-		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#270+(scr_w-16)*16,a0
+		adda.l	#270+(scr_w-16)*16,a1
 		move.w	(a1)+,(a0)+
-		adda.l	#24+(scr_w-16)*2,a0
-		adda.l	#24+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		adda.l	#22+(scr_w-16)*2,a0
+		adda.l	#22+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		adda.l	#12+(scr_w-16)*2,a0
+		adda.l	#12+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#4+(scr_w-16)*2,a0
+		adda.l	#4+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		adda.l	#18+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#(scr_w-16)*2,a0
+		adda.l	#(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#10+(scr_w-16)*2,a0
+		adda.l	#10+(scr_w-16)*2,a1
 		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		adda.l	#20+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#20+(scr_w-16)*2,a0
-		adda.l	#20+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		adda.l	#18+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		move.w	(a1)+,(a0)+
-		adda.l	#18+(scr_w-16)*2,a0
-		adda.l	#18+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
 		adda.l	#22+(scr_w-16)*2,a0
 		adda.l	#22+(scr_w-16)*2,a1
 		move.l	(a1)+,(a0)+
-		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		rts
 
 		section text
 green6clear:
-		adda.l	#12+(scr_w-16)*0,a0
-		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#302+(scr_w-16)*18,a0
+		adda.l	#302+(scr_w-16)*18,a1
 		move.w	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		adda.l	#24+(scr_w-16)*2,a0
 		adda.l	#24+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		move.w	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#16+(scr_w-16)*2,a0
-		adda.l	#16+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#20+(scr_w-16)*2,a0
+		adda.l	#20+(scr_w-16)*2,a1
+		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
@@ -1365,45 +1372,40 @@ green6clear:
 		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
 		adda.l	#22+(scr_w-16)*2,a0
 		adda.l	#22+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		move.l	(a1)+,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
-		adda.l	#26+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
 		rts
 
 		section text
 green7clear:
-		adda.l	#12+(scr_w-16)*0,a0
-		adda.l	#12+(scr_w-16)*0,a1
-		move.l	(a1)+,(a0)+
+		adda.l	#334+(scr_w-16)*20,a0
+		adda.l	#334+(scr_w-16)*20,a1
 		move.w	(a1)+,(a0)+
-		adda.l	#26+(scr_w-16)*2,a0
-		adda.l	#26+(scr_w-16)*2,a1
-		move.l	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
 		adda.l	#28+(scr_w-16)*2,a0
 		adda.l	#28+(scr_w-16)*2,a1
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		adda.l	#28+(scr_w-16)*2,a0
+		adda.l	#28+(scr_w-16)*2,a1
+		move.w	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		adda.l	#30+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		adda.l	#30+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		adda.l	#30+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
-		adda.l	#30+(scr_w-16)*2,a0
-		adda.l	#30+(scr_w-16)*2,a1
-		move.w	(a1)+,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		adda.l	#24+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		adda.l	#24+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
+		adda.l	#24+(scr_w-16)*2,a0
+		adda.l	#24+(scr_w-16)*2,a1
+		move.l	(a1)+,(a0)+
+		move.l	(a1)+,(a0)+
 		rts
 
-		section text
-green8clear:
-		rts
+greenclear_map:	dc.l	green0,green1,green2,green3,green4,green5,green6,green7
 
