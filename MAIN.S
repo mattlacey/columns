@@ -354,8 +354,8 @@ demo_parts:
 		;dummy effect doing nothing 
 
 seq_gameinit:	dc.l	0,dummy,dummy,game_init,2,1
-seq_gameloop:	dc.l	0,dummy,dummy,game_loop,2,1
-seq_gameover:	dc.l	0,dummy,dummy,game_over_loop,2,1
+seq_gameloop:	dc.l	0,dummy,dummy,game_loop,1,1
+seq_gameover:	dc.l	0,dummy,dummy,game_over_loop,1,1
 
 		;exit demo
 seq_exit:	dc.l	-1,dummy,dummy,exit,1,1
