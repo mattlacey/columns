@@ -54,6 +54,7 @@ grid_init:	movem.l	d0/a0,-(sp)
 		move.l	#grid_fast_off,grid_fast
 		
 		move.b	#0,grid_inpt_rot
+		move.b	#0,grid_inpt_drop
 		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
@@ -320,12 +321,6 @@ grid_rand_gem:	jsr	rand
 
 grid_plr_spawn:	movem.l	d0/a0-a2,-(sp)
 
-
-;		lea	grid,a0
-;		move.l	#grid_c-1,d0
-;grid_ps_loop:	and.b	#grid_xp_mask,(a0)+	; clear all player flags
-;		dbf	d0,grid_ps_loop
-
 		lea	grid,a0			; find spawn pos
 		adda.l	#3,a0
 		
@@ -380,15 +375,12 @@ grid_spawn_chk:	; if stable and no matches then spawn
 		jsr	grid_plr_spawn
 				
 		
-gu_input:	cmp.b	#1,grid_stable
-		beq	gu_input_done
-		
-		cmp.b	#1,grid_matched
+gu_input:	cmp.b	#1,grid_matched
 		beq	gu_input_done
 		
 		moveq.l	#0,d0
 		move.b	joy1,d0
-		move.b	joy2,d0
+		or.b	joy2,d0
 		
 		cmp.b	#0,grid_inpt_x
 		bgt	gu_input_cx
@@ -400,7 +392,7 @@ gu_input:	cmp.b	#1,grid_stable
 gu_input_right:	btst	#3,d0
 		beq	gu_input_up
 		jsr	grid_plr_right
-		
+				
 gu_input_cx:	subq.b	#1,grid_inpt_x
 		
 gu_input_up:	btst	#0,d0
@@ -414,10 +406,19 @@ gu_input_up:	btst	#0,d0
 gu_input_crot:	move.b	#0,grid_inpt_rot
 		
 gu_input_down:	btst	#1,d0				; drop gems
+		beq	gu_input_cdrop			; clear drop flag
+		
+		cmp.b	#1,grid_inpt_drop
 		beq	gu_input_done
-		move.l	#grid_fast_on,grid_fast
+		
+		move.b	#1,grid_inpt_drop
+		move.l	#grid_fast_on,grid_fast		; enable fast drop
 		lea	grid_plr,a0
 		move.l	#0,grid_plr_y_off(a0)
+		bra	gu_input_done
+
+gu_input_cdrop:	move.b	#0,grid_inpt_drop		
+		move.l	#grid_fast_off,grid_fast
 		
 gu_input_done:	; don't do any updates while the timer
 		; is counting down
@@ -697,6 +698,17 @@ grid_draw:	; draw fixed gems to screen
 		movea.l	screen_adr,a0
 		adda.l	#scr_w*16*2,a0
 		jsr	font_digit
+		
+		moveq.l	#0,d0
+		move.b	grid_matched,d0
+		adda.l	#scr_w*16*2,a0
+		jsr	font_digit
+		
+		moveq.l	#0,d0
+		move.b	grid_stable,d0
+		adda.l	#scr_w*16*2,a0
+		jsr	font_digit
+		
 		
 		
 		
@@ -997,7 +1009,7 @@ grid_plr_prev	ds.l	2	; last two screen offsets for player
 
 grid_inpt_x	ds.b	1	; rate limiter for x-movement
 grid_inpt_rot	ds.b	1	; used to ensure distinct presses
-				; for rotation
+grid_inpt_drop	ds.b	1	; for rotation and dropping
 
 grid_speed	ds.l	1
 
