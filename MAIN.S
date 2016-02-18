@@ -254,18 +254,14 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		endc						;
 
 		include 'gfx.s'
-		; include	'tiles.s'
-		; include	'input.s'
 		include 'backgrnd.s'
 		include	'font.s'
 		include 'joy.s'
 		include 'cexit.s'
-;		include 'sprites.s'
 		include 'game.s'
 		include 'grid.s'
 		include 'util.s'
 
-		include 'data\gems.s'
 		include 'data\red.s'
 		include 'data\blue.s'
 		include 'data\yellow.s'
