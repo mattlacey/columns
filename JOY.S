@@ -14,6 +14,7 @@ key_interrupt:
 		move.l	d0,-(sp)
 		moveq.l	#0,d0             		; clear register
 		move.b	$fffffc02.w,d0    		; get scancode
+		bclr	#4,$fffffa03
 		move.w	.table_start(pc,d0.w*2),d0	; get jump offset
 		jmp	.table_start(pc,d0.w)
 
