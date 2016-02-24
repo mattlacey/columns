@@ -26,10 +26,7 @@ grid_clr_f:	equ	$10			; clear flag
 grid_fclr_f:	equ	$20			; force clear - still draws a gem
 grid_clr_both:	equ	$30
 grid_match_f:	equ	$40			; mask for match flag
-grid_skip_f:	equ	$80			; skip flag - for now
-						; this is only set when
-						; a gem is falling down
-						; the screen.
+grid_static_f:	equ	$80			; for gems that haven't moved
 
 grid_fast_on:	equ	$f
 grid_fast_off:	equ	0						
@@ -40,7 +37,7 @@ grid_plr_bit:	equ	3
 grid_clr_bit:	equ	4
 grid_fclr_bit:	equ	5
 grid_match_bit:	equ	6
-grid_skip_bit:	equ	7
+grid_static_bit:equ	7
 
 
 
@@ -480,9 +477,11 @@ gu_loop:	moveq.l	#0,d3
 		and.b	#grid_type_mask,d3	; type of gem in d3
 
 		cmp.b	#0,d3
-		bgt	gu_skip			; skip filled squares
+		beq	gu_empty		; skip filled squares
+		or.b	#grid_static_f,(a0)	; and flag as static
+		bra	gu_skip
 		
-		move.l	a0,a1			; get square above
+gu_empty	move.l	a0,a1			; get square above
 		suba.l	#grid_w,a1		; address into a1 
 
 		moveq.l	#0,d4
@@ -511,6 +510,8 @@ gu_l2:		move.b	#0,grid_stable		; clear stable flag
 gu_skip:	
 		suba.l	#1,a0
 		dbf	d0,gu_loop
+	
+		; after loop
 		
 		lea	grid_plr,a0		; see if player gems have dropped
 		cmp.l	#16,grid_plr_y_off(a0)	
@@ -695,19 +696,19 @@ grid_draw:	; draw fixed gems to screen
 		moveq.l	#0,d0
 		move.l	grid_plr_y_off(a2),d0
 		move.l	d0,d5
-		movea.l	screen_adr,a0
-		adda.l	#scr_w*16*2,a0
-		jsr	font_digit
+;		movea.l	screen_adr,a0
+;		adda.l	#scr_w*16*2,a0
+;		jsr	font_digit
 		
-		moveq.l	#0,d0
-		move.b	grid_matched,d0
-		adda.l	#scr_w*16*2,a0
-		jsr	font_digit
+;		moveq.l	#0,d0
+;		move.b	grid_matched,d0
+;		adda.l	#scr_w*16*2,a0
+;		jsr	font_digit
 		
-		moveq.l	#0,d0
-		move.b	grid_stable,d0
-		adda.l	#scr_w*16*2,a0
-		jsr	font_digit
+;		moveq.l	#0,d0
+;		move.b	grid_stable,d0
+;		adda.l	#scr_w*16*2,a0
+;		jsr	font_digit
 		
 		
 		
@@ -755,7 +756,7 @@ dg1:
 				
 		btst	#grid_match_bit,d4	; matched?
 		bne	dg_match
-		
+						
 		movea.l	a1,a0
 
 		btst	#grid_plr_bit,d4	; player gem? add offset	
@@ -783,38 +784,29 @@ dg_clear_chk:	btst	#grid_fclr_bit,d4	; clear bg if force flag
 		jsr	dg_drawbg
 		movea.l	a1,a0
 		
+		btst	#grid_static_bit,d4	; static?
+		bne	dg_clear
+
+		
 dg_type:	and.b	#grid_type_mask,d4
+		cmp.b	#0,d4
+		beq	dg_clear
 
-		cmp.b	#0,d4			; zero, so skip
-		beq	dg_clear 		; temp - draw bg to clear everything
-				
-		cmp.b	#1,d4			; render gem		
-		beq	dg_1
-	
-		cmp.b	#2,d4		
-		beq	dg_2
+		moveq.l	#0,d6
+		move.b	d4,d6
+
+		lsl	#2,d6	
+		movea.l	#dg_jump,a3
+		movea.l	0(a3,d6.l),a3
+		jsr	(a3)
+		bra	dg_clear
+
+;		jmp	(a3,d6.l*4)
+
+dg_jump:
+		dc.l	dummy,red0,yellow0,purple0,green0,blue0
+
 		
-		cmp.b	#3,d4
-		beq	dg_3
-		
-		cmp.b	#4,d4
-		beq	dg_4
-		
-		jsr	blue0
-		bra	dg_clear
-
-dg_1:		jsr	red0
-		bra	dg_clear
-
-dg_2:		jsr	yellow0
-		bra	dg_clear
-
-dg_3:		jsr	purple0
-		bra	dg_clear
-		
-dg_4:		jsr	green0
-		bra	dg_clear
-
 
 dg_match:	; gems have been matched to do animations
 
@@ -831,7 +823,6 @@ dg_match:	; gems have been matched to do animations
 		beq	dg_clear
 
 		and.b	#grid_type_mask,d4
-
 
 dgm_red:	cmp.b	#1,d4
 		bne	dgm_yellow
