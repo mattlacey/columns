@@ -16,8 +16,8 @@ grid_dir_w	equ	(1)
 
 ; masks, type is bits 0-2, flags are 3-8
 grid_type_mask:	equ	$7			; gem type mask
-grid_typep_mask:equ	$f			; type & player flag
-grid_xp_mask:	equ	$f7			; clear player flag
+grid_typep_mask:equ	$f			; type & player flag mask
+grid_xp_mask:	equ	$f7			; exclude fplayer mask
 grid_flag_mask:	equ	$f8			; gem flags mask
 
 ; flags
@@ -468,7 +468,7 @@ gu_init_done:
 		lea	grid_plr,a2		; update player offset
 		move.l	grid_plr_y_off(a2),d5	
 		add.l	grid_speed,d5
-		add.l	grid_fast,d5
+		or.l	grid_fast,d5
 		move.l	d5,grid_plr_y_off(a2)
 
 
@@ -478,7 +478,10 @@ gu_loop:	moveq.l	#0,d3
 
 		cmp.b	#0,d3
 		beq	gu_empty		; skip filled squares
-		or.b	#grid_static_f,(a0)	; and flag as static
+		
+		btst	#grid_plr_bit,d3	; and if they're not player
+		bne	gu_skip
+		or.b	#grid_static_f,(a0)	; gems then flag as static
 		bra	gu_skip
 		
 gu_empty	move.l	a0,a1			; get square above
@@ -517,20 +520,20 @@ gu_skip:
 		cmp.l	#16,grid_plr_y_off(a0)	
 		blt	gu_done			; nope, do nothing else
 				
-		cmp.b	#1,grid_stable		; if the grid is stable
-		bne	gu_unstable
+		cmp.b	#1,grid_stable		; is the grid stable
+		bne	gu_unstable		; nope, still falling
 				
 		jsr	grid_matches		; check for matches
 		move.l	#0,grid_plr_y_off(a0)	; clear the player offset
 		
-		lea	grid,a0			; stable so 
-		move.l	#grid_c-1,d0		; clear all player flags
+		lea	grid,a0			; stable so clear static 
+		move.l	#grid_c-1,d0		; and player flags for
+						; player gems
 gu_s_loop:	btst	#grid_plr_bit,(a0)
-		beq	gu_s_loop2
-		
-		and.b	#grid_xp_mask,(a0)	; clear player flag
-;		or.b	#grid_fclr_f,(a0)	; set force-clear flag
-gu_s_loop2:	addq.l	#1,a0
+		beq	gu_s_loop_s
+		and.b	#$77,(a0)		
+
+gu_s_loop_s:	addq.l	#1,a0
 		dbf	d0,gu_s_loop
 		
 		
@@ -742,6 +745,9 @@ grid_draw:	; draw fixed gems to screen
 
 dg_loop_init:	; update offset buffer (if double buffering)
 		; move.l	grid_plr_prev,grid_plr_prev+4
+		
+		; clear in case there are no more player gems
+		move.l	#0,grid_plr_prev
 
 		move.l	#grid_c-1,d2		; loop counter		
 		moveq.l	#0,d3			; tracks x-wrapping
@@ -780,11 +786,12 @@ dg1:
 		bra	dg_type
 		
 dg_clear_chk:	btst	#grid_fclr_bit,d4	; clear bg if force flag
-		beq	dg_type			; is set
-		jsr	dg_drawbg
+		beq	dg_static		; is set
+		jsr	dg_drawbg	
 		movea.l	a1,a0
+		bra	dg_type
 		
-		btst	#grid_static_bit,d4	; static?
+dg_static:	btst	#grid_static_bit,d4	; static?
 		bne	dg_clear
 
 		
@@ -800,8 +807,6 @@ dg_type:	and.b	#grid_type_mask,d4
 		movea.l	0(a3,d6.l),a3
 		jsr	(a3)
 		bra	dg_clear
-
-;		jmp	(a3,d6.l*4)
 
 dg_jump:
 		dc.l	dummy,red0,yellow0,purple0,green0,blue0
