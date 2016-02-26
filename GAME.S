@@ -11,18 +11,6 @@ game_init:	movem.l	d0-a6,-(sp)
 		jsr	bg_draw
 
 		jsr	font_load
-		
-		movea.l	screen_adr1,a0
-		adda.l	#scr_w*2+4,a0
-		lea	txt_welcome,a1
-		jsr	font_print
-		
-		movea.l	screen_adr2,a0
-		adda.l	#scr_w*2+4,a0
-		lea	txt_welcome,a1
-		jsr	font_print
-
-
 		jsr	grid_init
 		
 		;move.l	#8,d0
@@ -42,14 +30,23 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 
-game_loop:	movem.l	d0-a6,-(sp)
+game_loop:	movem.l	a0-a1,-(sp)
 		addq.l	#1,ticks
 							
-		jsr	grid_update
 		jsr	grid_draw
+		
+		movea.l	screen_adr,a0
+		adda.l	#scr_w*2+4,a0
+		lea	txt_welcome,a1
+		jsr	font_print
+
 		jsr	game_draw_scr
+		
+		jsr	grid_update
+		
+		
 			
-game_loop_done:	movem.l	(sp)+,d0-a6
+game_loop_done:	movem.l	(sp)+,a0-a1
 		rts
 		
 		
