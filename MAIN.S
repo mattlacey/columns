@@ -308,12 +308,7 @@ detail:		dc.w	def_detailmode				;0=low 1=high
 
 inits:
 		dc.l	video_5					;set resolution
-		; dc.l	blackpal				;black palette
 
-; temp - init chequer map
-		; dc.l	chequer_map		
-
-		; dc.l	init_joystick
 		ifne	dspmodmusic				;
 		dc.l	dspmod_load				;load module/reserve mem
 		dc.l	dspmod_begin				;init musicroutine
@@ -349,7 +344,7 @@ inits:
 demo_parts:
 		;dummy effect doing nothing 
 
-seq_gameinit:	dc.l	0,dummy,dummy,game_init,2,1
+seq_gameinit:	dc.l	0,dummy,dummy,game_init,1,1
 seq_gameloop:	dc.l	0,dummy,dummy,game_loop,1,1
 seq_gameover:	dc.l	0,dummy,dummy,game_over_loop,1,1
 
