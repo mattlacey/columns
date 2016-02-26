@@ -17,11 +17,7 @@ bg_init:	movem.l	d0/a0,-(sp)
 
 bg_draw:	movem.l	a0-a1,-(sp)
 		lea	background,a0
-		movea.l	screen_adr1,a1
-		jsr	full_screen
-		
-		lea	background,a0
-		movea.l	screen_adr2,a1
+		movea.l	screen_adr,a1
 		jsr	full_screen
 		movem.l	(sp)+,a0-a1
 		rts
