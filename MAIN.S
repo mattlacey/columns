@@ -255,11 +255,11 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 
 		include 'gfx.s'
 		include 'backgrnd.s'
+		include 'grid.s'
 		include	'font.s'
 		include 'joy.s'
 		include 'cexit.s'
 		include 'game.s'
-		include 'grid.s'
 		include 'util.s'
 
 		include 'data\red.s'

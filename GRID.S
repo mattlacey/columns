@@ -47,7 +47,8 @@ grid_init:	movem.l	d0/a0,-(sp)
 		; initialise grid variables
 		move.l	#0,grid_match_c
 		move.l	grid_i_speed,grid_speed
-		move.l	grid_speed,grid_timer
+		move.l	grid_i_delay,grid_delay
+		move.l	grid_i_delay,grid_timer
 		move.l	#grid_fast_off,grid_fast
 		
 		move.b	#0,grid_inpt_rot
@@ -362,7 +363,14 @@ grid_update:	movem.l	d0-d5/a0-a3,-(sp)
 		cmp.l	#10,grid_match_c
 		blt	grid_spawn_chk
 		sub.l	#10,grid_match_c
-		cmp.l	#16,grid_speed
+		
+		; first decrease the delay, then adjust speed
+		cmp.l	#0,grid_delay
+		beq	grid_dec_spd
+		subq.l	#1,grid_delay
+		bra	grid_spawn_chk
+		
+grid_dec_spd:	cmp.l	#16,grid_speed
 		bge	grid_spawn_chk
 		addq.l	#1,grid_speed
 
@@ -411,16 +419,19 @@ gu_input_down:	btst	#1,d0				; drop gems
 		move.b	#1,grid_inpt_drop
 		move.l	#grid_fast_on,grid_fast		; enable fast drop
 		lea	grid_plr,a0
-		move.l	#0,grid_plr_y_off(a0)
 		bra	gu_input_done
 
-gu_input_cdrop:	move.b	#0,grid_inpt_drop		
-		move.l	#grid_fast_off,grid_fast
+gu_input_cdrop:	cmp.b	#1,grid_inpt_drop		; if drop flag is set
+		bne	gu_input_cfast			; then clear & set delay
+		move.b	#0,grid_inpt_drop
+		move.l	grid_delay,grid_timer
+			
+gu_input_cfast:	move.l	#grid_fast_off,grid_fast	; clear fast flag
 		
 gu_input_done:	; don't do any updates while the timer
 		; is counting down
-		move.l	grid_timer,d0
 		
+		move.l	grid_timer,d0
 		cmp.l	#0,d0
 		beq	gu_init
 				
@@ -432,6 +443,12 @@ gu_input_done:	; don't do any updates while the timer
 		
 		cmp.l	#0,d0
 		bne	gu_done
+		
+		; if we're not doing a fast drop then 
+		; reset the timer according to the delay
+		cmp.l	#grid_fast_on,grid_fast
+		beq	gu_init
+		move.l	grid_delay,grid_timer
 		
 
 gu_init:	; pre-processing before the main update
@@ -980,6 +997,7 @@ gdg1:		lsl	#2,d0
 	section	data
 
 grid_i_speed	dc.l	1	; initial speed
+grid_i_delay	dc.l	2
 grid_x_speed	dc.b	4
 
 
@@ -1008,6 +1026,7 @@ grid_inpt_rot	ds.b	1	; used to ensure distinct presses
 grid_inpt_drop	ds.b	1	; for rotation and dropping
 
 grid_speed	ds.l	1
+grid_delay	ds.l	1
 
 grid_fast	ds.l	1
 grid_match_c	ds.l	1
