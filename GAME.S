@@ -90,6 +90,16 @@ game_over_loop:	; game over so print text and do sweet fa
 		lea	txt_gameover,a1
 		jsr	font_print
 		
+		movea.l	screen_adr,a0
+		adda.l	#txt_score_p,a0
+		lea	txt_score,a1
+		jsr	font_print
+
+		movea.l	screen_adr,a0
+		adda.l	#txt_score_p2,a0
+		lea	p1_score_d,a1
+		jsr	font_bcd
+		
 		moveq.l	#0,d0				; move on on fire
 		move.b	joy1,d0
 		or.b	joy2,d0
@@ -120,6 +130,10 @@ game_over:	move.l	#1,p1_gameover
 txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
 txt_gameover	dc.b	'* GAME OVER *',0
 txt_gameover_p	equ	(2*scr_w*116+(scr_w-13*8))	; screen offset
+
+txt_score	dc.b	'YOUR SCORE:',0
+txt_score_p	equ	(2*scr_w*124+(scr_w-11*8))	; screen offset
+txt_score_p2	equ	(2*scr_w*132+(scr_w-9*8))	; screen offset
 
 p1_scr_inc:	dc.l	10
 p1_scr_inc_d:	dc.l	$10
