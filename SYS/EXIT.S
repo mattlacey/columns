@@ -21,6 +21,7 @@
 exit:		cmp.w	#9,runlevel				;9=interupts
 		blt.s	.r8					;next
 		bsr.w	restore_ints				;restore interups
+
 ;		ifne	enable_timing
 ;		bsr.l	timing_reset
 ;		endc
