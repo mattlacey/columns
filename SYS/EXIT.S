@@ -22,6 +22,9 @@ exit:		cmp.w	#9,runlevel				;9=interupts
 		blt.s	.r8					;next
 		bsr.w	restore_ints				;restore interups
 		bsr.w	custom_exit
+;		ifne	enable_timing
+;		bsr.l	timing_reset
+;		endc
 ;---------------------------------------------------------------
 .r8:		cmp.w	#8,runlevel				;8=music
 		blt.s	.r7					;next
@@ -36,6 +39,14 @@ exit:		cmp.w	#9,runlevel				;9=interupts
 .r7:		cmp.w	#7,runlevel				;7=keyklick
 		blt.s	.r6					;next
 		bsr.w	restore_click				;restore keyclick
+
+		; Restore the mouse
+		moveq	#$8,d0
+		lea	$fffffc00.w,a1
+.l1:		move.b (a1),d1
+		btst	#1,d1
+		beq.s	.l1
+		move.b	d0,2(a1)
 ;---------------------------------------------------------------
 .r6:		cmp.w	#6,runlevel				;6=video
 		blt.s	.r5					;next
@@ -168,6 +179,12 @@ restore_video:	lea.l	save_video,a0				;restore video
 		dbra	d7,.loop				;
 		movem.l	(a1),d0-d7				;restore st palette
 		movem.l	d0-d7,$ffff8240.w			;
+
+		; restore_030_cache_settings
+		move.l	save_cacr,d0
+		bset	#11,d0 ; clear data cache
+		bset	#3,d0 ; clear inst cache
+		movec	d0,cacr
 		rts
 
 

@@ -232,7 +232,7 @@ key_interrupt:
          dc.w      .default-.table_start ;d2
          dc.w      .default-.table_start ;d3
          dc.w      .default-.table_start ;d4
-         dc.w      .default-.table_start ;5d
+         dc.w      .default-.table_start ;d5
          dc.w      .default-.table_start ;d6
          dc.w      .default-.table_start ;d7
          dc.w      .default-.table_start ;d8

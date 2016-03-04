@@ -133,7 +133,6 @@ mainloop:
 		bra	mainloop
 		
 		bne.w	mainloop
-;		jsr	custom_exit				;
 		bra.w	exit					;
 
 .var:		ds.w	1
@@ -258,7 +257,6 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include 'grid.s'
 		include	'font.s'
 		include 'joy.s'
-		include 'cexit.s'
 		include 'game.s'
 		include 'util.s'
 
@@ -381,6 +379,7 @@ save_dta:	ds.l	1					;old dta address
 save_pal:	ds.l	256+8					;old colours (falcon+st/e)
 save_video:	ds.b	32+12+2					;videl save
 save_keymode:	ds.w	1					;old keyclick mode
+save_cacr:	ds.l	1
 dta:		ds.l	11					;new dta buffer
 
 		end
