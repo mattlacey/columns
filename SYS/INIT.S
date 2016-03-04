@@ -214,9 +214,16 @@ begin:
 ; --------------------------------------------------------------
 
 		move.b	$484.w,save_keymode			;save keyclick
-		bclr	#0,$484					;keyclick off
+		bclr	#0,$484.w				;keyclick off
 		addq.w	#1,runlevel				;7 restore keyclick
 
+		; Remove the mouse
+		moveq	#$12,d0
+		lea	$fffffc00.w,a1
+.l1:		move.b (a1),d1
+		btst	#1,d1
+		beq.s	.l1
+		move.b	d0,2(a1)
 
 ; --------------------------------------------------------------
 ;		run the init-list
@@ -245,24 +252,20 @@ begin:
 		move.w	sr,d0					;save sr
 		move.w	#$2700,sr				;ints off
 
-		lea.l	save_mfp,a0
-								;save mfp
-		move.b	$fffffa07.w,(a0)+
+		lea.l	save_mfp,a0				;save mfp
+		move.b	$fffffa07.w,(a0)+			;
 		move.b	$fffffa09.w,(a0)+			;
-		move.b	$fffffa13.w,(a0)+
+		move.b	$fffffa13.w,(a0)+			;
 		move.b	$fffffa15.w,(a0)+			;
-		move.b	$fffffa17.w,(a0)+
+		move.b	$fffffa17.w,(a0)+			;
 		move.b	$fffffa1d.w,(a0)+			;
 		move.b	$fffffa25.w,(a0)+			;
 
-		clr.b	$fffffa07.w
-		bset.b	#4,$fffffa09.w				;timer-d
-		bset.b	#6,$fffffa09.w
-		
-		clr.b	$fffffa13.w
-		or.b	#$50,$fffffa15.w			;and keyboard
-		and.b	#$f0,$fffffa17.w			;vector base offset?
-
+		clr.b	$fffffa07.w				;
+		or.b	#$50,$fffffa09.w			;timer-d
+		clr.b	$fffffa13.w				;
+		or.b	#$50,$fffffa15.w			;
+		and.b	#$f0,$fffffa17.w			;
 		or.b	#%111,$fffffa1d.w			;%111 = divide by 200
 		move.b	#41,$fffffa25.w			;2457600/200/41 approx 300 Hz
 
@@ -280,3 +283,26 @@ begin:
 		move.l	#vbl,$70.w				;own vbl
 
 		move.w	d0,sr					;ints back
+
+
+; --------------------------------------------------------------
+;		init the timing code (frames per second)
+; --------------------------------------------------------------
+;		ifne		enable_timing
+;		bsr.l		timing_init
+;		endc
+
+; --------------------------------------------------------------
+;		activate instruction cache
+; --------------------------------------------------------------
+		; save current cache register value
+		movec cacr,d0
+		move.l d0,save_cacr
+
+		; activate instruction cache / desactivate data cache
+		bset	#0,d0					; i cache on
+		bset	#4,d0					; i burst on
+		bclr	#8,d0					; d cache off
+		bclr	#12,d0					; d burst off
+		movec	d0,cacr
+

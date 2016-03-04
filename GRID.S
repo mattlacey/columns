@@ -365,7 +365,7 @@ grid_update:	movem.l	d0-d5/a0-a3,-(sp)
 		sub.l	#10,grid_match_c
 		
 		; first decrease the delay, then adjust speed
-		cmp.l	#0,grid_delay
+		cmp.l	#1,grid_delay
 		beq	grid_dec_spd
 		subq.l	#1,grid_delay
 		bra	grid_spawn_chk
@@ -386,8 +386,8 @@ gu_input:	cmp.b	#1,grid_matched
 		moveq.l	#0,d0
 		move.b	joy1,d0
 		or.b	joy2,d0
-		
-		cmp.b	#0,grid_inpt_x
+				
+gu_input_test:	cmp.b	#0,grid_inpt_x
 		bgt	gu_input_cx
 		
 		btst	#2,d0
@@ -401,16 +401,24 @@ gu_input_right:	btst	#3,d0
 gu_input_cx:	subq.b	#1,grid_inpt_x
 		
 gu_input_up:	btst	#0,d0
-		beq	gu_input_crot
+		beq	gu_input_down
 		move.l	d0,-(sp)
 		move.l	#0,d0
 		jsr	grid_plr_rot
 		move.l	(sp)+,d0
-		jmp	gu_input_down
+		jmp	gu_input_fire
+		
+gu_input_down:	btst	#1,d0
+		beq	gu_input_crot
+		move.l	d0,-(sp)
+		move.l	#1,d0
+		jsr	grid_plr_rot
+		move.l	(sp)+,d0
+		jmp	gu_input_fire		
 		
 gu_input_crot:	move.b	#0,grid_inpt_rot
 		
-gu_input_down:	btst	#1,d0				; drop gems
+gu_input_fire:	btst	#7,d0				; drop gems
 		beq	gu_input_cdrop			; clear drop flag
 		
 		cmp.b	#1,grid_inpt_drop
