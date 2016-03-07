@@ -6,6 +6,12 @@ JOY_RIGHT:	equ	8
 JOY_DOWN:	equ	2
 JOY_FIRE:	equ	$80
 
+J_UP:		equ	0
+J_DOWN:		equ	1
+J_LEFT:		equ	2
+J_RIGHT:	equ	3
+J_FIRE:		equ	7
+
 
 	section text
 

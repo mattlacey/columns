@@ -5,12 +5,7 @@
 
 game_init:	movem.l	d0-a6,-(sp)
 	
-		move.l	#0,ticks		; clear ticks
-
-		jsr 	bg_init			; setup grid
 		jsr	bg_draw
-
-		jsr	font_load
 		jsr	grid_init
 		
 		;move.l	#8,d0
@@ -106,7 +101,7 @@ game_over_loop:	; game over so print text and do sweet fa
 
 		btst	#0,d0
 		beq	game_ol_fire
-		move.l	#seq_exit,current_fx
+		move.l	#seq_menuinit,current_fx
 		bra	game_ol_done
 		
 game_ol_fire:	btst	#7,d0
