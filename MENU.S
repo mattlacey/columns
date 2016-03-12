@@ -30,7 +30,7 @@ main_menu_init:	movem.l	a0-a1,-(sp)
 		
 		
 		
-main_menu_loop:	movem.l	d0/a0-a1,-(sp)
+main_menu_loop:	movem.l	d0-d1/a0-a1,-(sp)
 
 		jsr	main_menu_cur		; trashes a1 so do first
 		lea	background,a1
@@ -39,34 +39,39 @@ main_menu_loop:	movem.l	d0/a0-a1,-(sp)
 		adda.l	d0,a1
 		jsr	red0clear
 		
-		cmp.b	#0,mm_mov_t
+		cmp.b	#8,mm_mov_t
+		bne	mml_t
+		move.b	mm_next,mm_curr
+		
+mml_t:		cmp.b	#0,mm_mov_t
 		bgt	mml_skip
-
+		
 		moveq.l	#0,d0			
 		move.b	joy1,d0
 		or.b	joy2,d0
 
 		btst	#J_UP,d0		; move cursor up
 		beq	mml_down
-		move.b	#16,mm_mov_t
+		move.b	#15,mm_mov_t
 		cmp.b	#0,mm_curr
 		beq	mml_up_wrap
-		sub.b	#1,mm_curr
-		move.b	#16,mm_mov_t
+		move.b	mm_curr,mm_next
+		sub.b	#1,mm_next
 		bra	mml_done
 		
 mml_down:	btst	#J_DOWN,d0		; cursor down
 		beq	mml_fire
-		move.b	#16,mm_mov_t
+		move.b	#15,mm_mov_t
 		cmp.b	#mm_count-1,mm_curr
 		beq	mml_dn_wrap
-		add.b	#1,mm_curr
+		move.b	mm_curr,mm_next
+		add.b	#1,mm_next
 		bra	mml_done	
 		
-mml_up_wrap:	move.b	mm_count-1,mm_curr	; wrapping
+mml_up_wrap:	move.b	#mm_count-1,mm_next	; wrapping
 		bra	mml_done
 
-mml_dn_wrap:	move.b	#0,mm_curr
+mml_dn_wrap:	move.b	#0,mm_next
 		bra	mml_done
 		
 mml_fire:	btst	#7,d0
@@ -87,10 +92,8 @@ mml_quit:	cmp.b	#2,mm_curr
 		
 mml_skip:	sub.b	#1,mm_mov_t
 
-mml_done:	jsr	main_menu_cur
-		jsr	red0
-
-		movem.l	(sp)+,d0/a0-a1
+mml_done:	jsr	main_menu_draw
+		movem.l	(sp)+,d0-d1/a0-a1
 		rts
 	
 		
@@ -108,7 +111,23 @@ main_menu_cur:
 
 
 		
-main_menu_draw:	rts
+main_menu_draw:	jsr	main_menu_cur
+
+		moveq.l	#0,d0			; for the first half of 
+		move.b	mm_mov_t,d0		; the move timer we animate
+		cmp.l	#8,d0			; out the old gem, second
+		blt	mmd1			; half animate in the new
+		move.l	#15,d1
+		sub.b	d0,d1
+		move.l	d1,d0
+
+mmd1:		lea	red_map,a1
+		lsl	#2,d0
+		adda.l	d0,a1
+		move.l	(a1),a1
+		jsr	(a1)
+		
+		rts
 
 
 
@@ -133,5 +152,6 @@ txt_diff_easy	dc.b	'EASY',0
 txt_diff_medium	dc.b	'HARD',0
 
 mm_curr		ds.b	1
+mm_next		ds.b	1
 mm_mov_t	ds.b	1
 

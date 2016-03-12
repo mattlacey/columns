@@ -98,15 +98,10 @@ game_over_loop:	; game over so print text and do sweet fa
 		moveq.l	#0,d0				; move on on fire
 		move.b	joy1,d0
 		or.b	joy2,d0
-
-		btst	#0,d0
-		beq	game_ol_fire
-		move.l	#seq_menuinit,current_fx
-		bra	game_ol_done
 		
 game_ol_fire:	btst	#7,d0
 		beq	game_ol_done
-		move.l	#seq_gameinit,current_fx
+		move.l	#seq_menuinit,current_fx
 
 game_ol_done:	rts
 		

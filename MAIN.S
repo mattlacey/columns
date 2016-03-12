@@ -258,7 +258,9 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include	'font.s'
 		include 'joy.s'
 		include 'game.s'
+		include	'menu.s'
 		include 'util.s'
+		include 'setup.s'
 
 		include 'data\red.s'
 		include 'data\blue.s'
@@ -306,6 +308,8 @@ detail:		dc.w	def_detailmode				;0=low 1=high
 
 inits:
 		dc.l	video_5					;set resolution
+		
+		dc.l	setup_all				;general loading
 
 		ifne	dspmodmusic				;
 		dc.l	dspmod_load				;load module/reserve mem
@@ -342,6 +346,9 @@ inits:
 demo_parts:
 		;dummy effect doing nothing 
 
+; seq_setup:	dc.l	0,dummy,dummy,setup_all,1,1
+seq_menuinit:	dc.l	0,dummy,dummy,main_menu_init,1,1
+seq_menuloop:	dc.l	0,dummy,dummy,main_menu_loop,1,1
 seq_gameinit:	dc.l	0,dummy,dummy,game_init,1,1
 seq_gameloop:	dc.l	0,dummy,dummy,game_loop,1,1
 seq_gameover:	dc.l	0,dummy,dummy,game_over_loop,1,1
