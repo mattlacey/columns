@@ -7,6 +7,7 @@ main_menu_init:	movem.l	a0-a1,-(sp)
 		jsr	bg_draw
 		
 		move.b	#0,mm_curr
+		move.b	#0,mm_next
 		move.b	#0,mm_mov_t
 
 		movea.l	screen_adr,a0
@@ -31,6 +32,8 @@ main_menu_init:	movem.l	a0-a1,-(sp)
 		
 		
 main_menu_loop:	movem.l	d0-d1/a0-a1,-(sp)
+
+		jsr	joy_update
 
 		jsr	main_menu_cur		; trashes a1 so do first
 		lea	background,a1
@@ -74,9 +77,11 @@ mml_up_wrap:	move.b	#mm_count-1,mm_next	; wrapping
 mml_dn_wrap:	move.b	#0,mm_next
 		bra	mml_done
 		
-mml_fire:	btst	#7,d0
+mml_fire:	moveq.l	#0,d0
+		move.b	joy1fire,d0
+		or.b	joy2fire,d0
+		btst	#7,d0
 		beq	mml_done
-		
 		cmp.b	#0,mm_curr
 		bne	mml_diff
 		move.l	#seq_gameinit,current_fx

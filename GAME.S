@@ -27,7 +27,7 @@ game_init:	movem.l	d0-a6,-(sp)
 
 game_loop:	movem.l	a0-a1,-(sp)
 		addq.l	#1,ticks
-							
+		
 		jsr	grid_draw
 		
 		movea.l	screen_adr,a0
@@ -95,11 +95,12 @@ game_over_loop:	; game over so print text and do sweet fa
 		lea	p1_score_d,a1
 		jsr	font_bcd
 		
+		jsr	joy_update					
 		moveq.l	#0,d0				; move on on fire
-		move.b	joy1,d0
-		or.b	joy2,d0
+		move.b	joy1fire,d0
+		or.b	joy2fire,d0
 		
-game_ol_fire:	btst	#7,d0
+game_ol_fire:	btst	#J_FIRE,d0
 		beq	game_ol_done
 		move.l	#seq_menuinit,current_fx
 

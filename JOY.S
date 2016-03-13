@@ -330,7 +330,7 @@ key_interrupt:
          and.b     #~JOY_RIGHT,joy2
          move.l    (sp)+,d0          ; restore registers
          rte                         ; done
-    .cur_down_p:
+    .cur_down_p: 
          or.b      #JOY_DOWN,joy2
          move.l    (sp)+,d0          ; restore registers
          rte                         ; done
@@ -343,9 +343,41 @@ key_interrupt:
          move.l    (sp)+,d0          ; restore registers
          rte                         ; done
     .cur_fire_r:
-         and.b     #$7f,joy2
+    	 and.b     #$7f,joy2
          move.l    (sp)+,d0          ; restore registers
          rte                         ; done
+
+
+
+
+joy_update:	movem.l	d0,-(sp)
+		
+		moveq.l	#0,d0
+         	move.b	joy0last,d0
+         	not.b	d0
+         	and.b	joy0,d0
+         	move.b	d0,joy0fire	
+         	move.b	joy0,joy0last
+
+		moveq.l	#0,d0
+         	move.b	joy1last,d0
+         	not.b	d0
+         	and.b	joy1,d0
+         	move.b	d0,joy1fire	
+         	move.b	joy1,joy1last
+		
+		moveq.l	#0,d0
+         	move.b	joy2last,d0
+         	not.b	d0
+         	and.b	joy2,d0
+         	move.b	d0,joy2fire
+         	move.b	joy2,joy2last
+         	
+         	movem.l	(sp)+,d0
+         	rts
+         
+
+
 
 	section data
 
@@ -354,5 +386,13 @@ joy0:		dc.b	0     ;  volatile byte joy0;
 joy1:		dc.b	0     ;  volatile byte joy1;
 joy2:		dc.b	0     ;  volatile byte joy2; /* cursor joystick */
 last_key:	dc.b	0     ;  volatile byte last_key;
+
+joy0fire:	dc.b	0
+joy1fire:	dc.b	0
+joy2fire:	dc.b	0
+
+joy0last:	dc.b	0
+joy1last:	dc.b	0
+joy2last:	dc.b	0
 
 	even
