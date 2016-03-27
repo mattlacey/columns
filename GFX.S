@@ -158,6 +158,39 @@ fade_black_l3:
 		rts
 
 
+
+blit_16x16:	movem.l	a0-a1,-(sp)
+
+		REPT 16
+					
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+		move.w	(a1)+,(a0)+
+
+		adda.l	#v_scr_w*2-16*2,a0	; next row
+		adda.l	#v_scr_w*2-16*2,a1
+		
+		ENDR
+		
+		movem.l	(sp)+,a0-a1
+		rts
+		
+		
+		
+		
 		section data
 
 debug_count:	dc.l	0

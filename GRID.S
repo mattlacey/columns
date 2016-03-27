@@ -52,7 +52,7 @@ grid_init:	movem.l	d0/a0,-(sp)
 		move.l	#grid_fast_off,grid_fast
 		
 		move.b	#0,grid_inpt_rot
-		move.b	#0,grid_inpt_drop
+		move.b	#1,grid_inpt_drop
 		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	

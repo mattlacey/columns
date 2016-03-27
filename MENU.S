@@ -40,7 +40,7 @@ main_menu_loop:	movem.l	d0-d1/a0-a1,-(sp)
 		move.l	a0,d0			; find the offset to
 		sub.l	screen_adr,d0		; add to the bg addr
 		adda.l	d0,a1
-		jsr	red0clear
+		jsr	blit_16x16
 		
 		cmp.b	#8,mm_mov_t
 		bne	mml_t
