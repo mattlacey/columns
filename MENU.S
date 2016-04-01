@@ -91,6 +91,8 @@ mml_fire:	moveq.l	#0,d0
 				
 		cmp.b	#0,mm_curr
 		bne	mml_music
+		
+		jsr	sfx_menusel
 		move.l	#seq_gameinit,current_fx
 		bra	mml_done
 		
@@ -105,6 +107,7 @@ mml_music:	cmp.b	#1,mm_curr
 		bra	mml_done
 
 mml_music_off:	jsr	mp2_end
+		jsr	sfx_init
 		jsr	sfx_menusel
 		bra	mml_done
 		
@@ -156,15 +159,15 @@ mmd1:		lea	red_map,a1
 
 		section data
 
-mm_pos		equ	(2*scr_w*100+2*150)
-mm_cur_pos	equ	(2*scr_w*96+2*130)
+mm_pos		equ	(2*scr_w*100+2*140)
+mm_cur_pos	equ	(2*scr_w*96+2*120)
 
 mm_cur_off	dc.l	mm_cur_pos,mm_cur_pos+(2*scr_w*16),mm_cur_pos+(4*scr_w*16)
 		
 txt_mm_play	dc.b	'PLAY',0
 txt_mm_play_l	equ	4
-txt_mm_diff	dc.b	'SFX/MUSIC',0
-txt_mm_diff_l	equ	4
+txt_mm_diff	dc.b	'SFX/BGM',0
+txt_mm_diff_l	equ	7
 txt_mm_quit	dc.b	'QUIT',0
 txt_mm_quit_l	equ	4
 
