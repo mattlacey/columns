@@ -250,24 +250,23 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 
 		ifne	startupmenu				;
 		include	'sys\startup.s'				;startup menu
-		endc						;
+		endc								;
 
 		include 'gfx.s'
 		include 'backgrnd.s'
 		include 'grid.s'
-		include	'font.s'
 		include 'joy.s'
 		include 'game.s'
 		include	'menu.s'
 		include 'util.s'
 		include 'setup.s'
-
+		include	'font.s'
+		
 		include 'data\red.s'
 		include 'data\blue.s'
 		include 'data\yellow.s'
 		include 'data\purple.s'
 		include 'data\green.s'
-
 
 		ifne	dspmodmusic				;
 		include	'sys\dspmod.s'				;tracker player
@@ -277,6 +276,8 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		include	'sys\mp2.s'				;mpeg player
 		endc						;
 
+		include 'sfx.s'
+		
 
 		
 ; --------------------------------------------------------------

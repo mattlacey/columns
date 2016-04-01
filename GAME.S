@@ -137,3 +137,4 @@ paused:		ds.l	1
 p1_score:	ds.l	1
 p1_score_d:	ds.l	1
 p1_gameover:	ds.l	1
+music_on:	ds.l	1

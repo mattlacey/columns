@@ -562,8 +562,14 @@ gu_s_loop_s:	addq.l	#1,a0
 		dbf	d0,gu_s_loop
 		
 		
-		cmp.b	#1,grid_matched		; stable, but no matches so spawn
-		beq	gu_done
+		cmp.b	#0,grid_matched		; stable, if no matches spawn
+		beq	gu_spawn
+		
+		jsr	sfx_match
+		bra	gu_done
+		
+		
+gu_spawn:	jsr	sfx_drop
 		move.b	#1,grid_spawn
 		
 gu_unstable:	jsr	grid_plr_inc_y		; otherwise increment player y		

@@ -55,6 +55,9 @@ mml_t:		cmp.b	#0,mm_mov_t
 
 		btst	#J_UP,d0		; move cursor up
 		beq	mml_down
+		
+		jsr	sfx_menumove
+		
 		move.b	#15,mm_mov_t
 		cmp.b	#0,mm_curr
 		beq	mml_up_wrap
@@ -64,6 +67,9 @@ mml_t:		cmp.b	#0,mm_mov_t
 		
 mml_down:	btst	#J_DOWN,d0		; cursor down
 		beq	mml_fire
+		
+		jsr	sfx_menumove
+		
 		move.b	#15,mm_mov_t
 		cmp.b	#mm_count-1,mm_curr
 		beq	mml_dn_wrap
@@ -82,13 +88,24 @@ mml_fire:	moveq.l	#0,d0
 		or.b	joy2fire,d0
 		btst	#7,d0
 		beq	mml_done
+				
 		cmp.b	#0,mm_curr
-		bne	mml_diff
+		bne	mml_music
 		move.l	#seq_gameinit,current_fx
 		bra	mml_done
 		
-mml_diff:	cmp.b	#1,mm_curr
+mml_music:	cmp.b	#1,mm_curr
 		bne	mml_quit
+		
+		not.l	music_on
+		cmp.l	#0,music_on
+		beq	mml_music_off
+		
+		jsr	mp2_begin
+		bra	mml_done
+
+mml_music_off:	jsr	mp2_end
+		jsr	sfx_menusel
 		bra	mml_done
 		
 mml_quit:	cmp.b	#2,mm_curr
@@ -146,7 +163,7 @@ mm_cur_off	dc.l	mm_cur_pos,mm_cur_pos+(2*scr_w*16),mm_cur_pos+(4*scr_w*16)
 		
 txt_mm_play	dc.b	'PLAY',0
 txt_mm_play_l	equ	4
-txt_mm_diff	dc.b	'TODO',0
+txt_mm_diff	dc.b	'SFX/MUSIC',0
 txt_mm_diff_l	equ	4
 txt_mm_quit	dc.b	'QUIT',0
 txt_mm_quit_l	equ	4
