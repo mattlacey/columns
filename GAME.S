@@ -5,6 +5,12 @@
 		; once off initialisation (on load)
 game_pre_init:	move.l	#0,p1_score_high
 		move.l	#0,p1_score_high_d
+		
+		; load high scores if they exist
+		move.l	#file_scores,filename.l
+		move.l	#p1_score_high,filebuffer.l
+		jsr	loader
+		
 		rts
 
 
@@ -12,12 +18,10 @@ game_pre_init:	move.l	#0,p1_score_high
 
 game_init:	movem.l	d0-a6,-(sp)
 	
+		jsr	bg_load_game
 		jsr	bg_draw
 		jsr	grid_init
-		
-		;move.l	#8,d0
-		;jsr	grid_random
-		
+				
 		move.l	#0,p1_score
 		move.l	#0,p1_score_d
 		move.l	#0,p1_gameover
@@ -123,6 +127,13 @@ game_ol_fire:	btst	#J_FIRE,d0
 		move.l	p1_score,p1_score_high
 		move.l	p1_score_d,p1_score_high_d
 		
+		; save score file
+		move.l	#file_scores,filename.l
+		move.l	#p1_score_high,filebuffer.l
+		move.l	#8,filelength.l
+		jsr	writer
+		
+		
 game_ol_fe:	move.l	#seq_menuinit,current_fx
 
 game_ol_done:	rts
@@ -138,6 +149,9 @@ game_over:	move.l	#1,p1_gameover
 		
 				
 		section data
+
+
+file_scores	dc.b	'data\score.dat',0
 		
 txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
 txt_gameover	dc.b	'* GAME OVER *',0

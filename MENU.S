@@ -4,6 +4,7 @@
 		
 main_menu_init:	movem.l	a0-a1,-(sp)
 
+		jsr	bg_load_title
 		jsr	bg_draw
 		
 		move.b	#0,mm_curr
@@ -159,8 +160,8 @@ mmd1:		lea	red_map,a1
 
 		section data
 
-mm_pos		equ	(2*scr_w*100+2*140)
-mm_cur_pos	equ	(2*scr_w*96+2*120)
+mm_pos		equ	(2*scr_w*104+2*142)
+mm_cur_pos	equ	(2*scr_w*100+2*122)
 
 mm_cur_off	dc.l	mm_cur_pos,mm_cur_pos+(2*scr_w*16),mm_cur_pos+(4*scr_w*16)
 		

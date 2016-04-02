@@ -1,15 +1,28 @@
 
 bg_init:	movem.l	d0/a0,-(sp)
+		movem.l	(sp)+,d0/a0
+		rts
 
+
+
+
+bg_load_title:	movem.l	a0,-(sp)
 		lea	background,a0
-		move.l	#$0088,d0
-		jsr	clear_scr
-		
-		move.l	#bg_filename,filename.l
+		move.l	#bg_title_file,filename.l
 		move.l	#background,filebuffer.l
 		jsr	loader
+		movem.l	(sp)+,a0
+		rts
 
-		movem.l	(sp)+,d0/a0
+
+
+
+bg_load_game:	movem.l	a0,-(sp)
+		lea	background,a0
+		move.l	#bg_game_file,filename.l
+		move.l	#background,filebuffer.l
+		jsr	loader
+		movem.l	(sp)+,a0
 		rts
 
 
@@ -83,5 +96,6 @@ background:	ds.b	scr_w*scr_h*2
 
 		section data
 
-bg_filename	dc.b	'data\MARS.BIN',0
+bg_title_file	dc.b	'data\title.bin',0
+bg_game_file	dc.b	'data\MARS.BIN',0
 		even

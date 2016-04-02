@@ -57,6 +57,49 @@ loader:		move.w	#0,-(sp)				;fsfirst() get fileinfo
 		rts
 
 
+
+writer:		move.w	#0,-(sp)				;fsfirst() get fileinfo
+		move.l	filename,-(sp)				;
+		move.w	#$4e,-(sp)				;
+		trap	#1					;
+		addq.l	#8,sp					;
+
+		tst.l	d0					;
+		beq.s	w_fopen					;file exists
+		
+		move.w	#0,-(sp)
+		move.l	filename,-(sp)
+		move.w	#$3c,-(sp)
+		trap	#1
+		addq.l	#8,sp
+		move.w	d0,filenumber
+		bra	w_fwrite				;fcreate
+		
+
+w_fopen:	move.w	#1,-(sp)				;open file read only
+		move.l	filename,-(sp)				;address to filename
+		move.w	#$3d,-(sp)				;
+		trap	#1					;
+		addq.l	#8,sp					;
+		move.w	d0,filenumber				;store filenumber
+		
+w_fwrite:	move.l	filebuffer,-(sp)			;buffer address
+		move.l	filelength,-(sp)			;length of file
+		move.w	filenumber,-(sp)			;filenumber
+		move.w	#$40,-(sp)				;
+		trap	#1					;
+		lea.l	12(sp),sp				;
+								;fclose		
+		move.w	filenumber,-(sp)			;filenumber for closing
+		move.w	#$3e,-(sp)				;
+		trap	#1					;
+		addq.l	#4,sp					;
+ 		
+		rts
+		
+		
+		
+		
 ; --------------------------------------------------------------
 		section	bss
 ; --------------------------------------------------------------
