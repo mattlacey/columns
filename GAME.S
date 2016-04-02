@@ -2,6 +2,13 @@
  		section text
 
 
+		; once off initialisation (on load)
+game_pre_init:	move.l	#0,p1_score_high
+		move.l	#0,p1_score_high_d
+		rts
+
+
+
 
 game_init:	movem.l	d0-a6,-(sp)
 	
@@ -59,7 +66,7 @@ game_inc_scr:	movem.l	d0/a0-a1,-(sp)
 		abcd	-(a0),-(a1)
 		abcd	-(a0),-(a1)
 		abcd	-(a0),-(a1)
-		abcd	-(a0),-(a1)
+		abcd	-(a0),-(a1)		
 		
 		movem.l	(sp)+,d0/a0-a1
 		rts		
@@ -69,8 +76,13 @@ game_inc_scr:	movem.l	d0/a0-a1,-(sp)
 
 game_draw_scr:	movem.l	a0-a1,-(sp)
 		movea.l	screen_adr,a0
-		adda.l	#scr_w*(scr_h-10)*2+16,a0
+		adda.l	#curr_sc_pos,a0
 		lea	p1_score_d,a1
+		jsr	font_bcd
+		
+		movea.l	screen_adr,a0
+		adda.l	#high_sc_pos,a0
+		lea	p1_score_high_d,a1
 		jsr	font_bcd
 		
 		movem.l	(sp)+,a0-a1
@@ -102,7 +114,16 @@ game_over_loop:	; game over so print text and do sweet fa
 		
 game_ol_fire:	btst	#J_FIRE,d0
 		beq	game_ol_done
-		move.l	#seq_menuinit,current_fx
+		
+		move.l	p1_score,d0
+		cmp.l	p1_score_high,d0
+		ble	game_ol_fe
+		
+		; new high score so update
+		move.l	p1_score,p1_score_high
+		move.l	p1_score_d,p1_score_high_d
+		
+game_ol_fe:	move.l	#seq_menuinit,current_fx
 
 game_ol_done:	rts
 		
@@ -126,6 +147,9 @@ txt_score	dc.b	'YOUR SCORE:',0
 txt_score_p	equ	(2*scr_w*124+(scr_w-11*8))	; screen offset
 txt_score_p2	equ	(2*scr_w*132+(scr_w-9*8))	; screen offset
 
+curr_sc_pos:	equ	(2*scr_w*200+44)
+high_sc_pos:	equ	(2*scr_w*200+466)
+
 p1_scr_inc:	dc.l	10
 p1_scr_inc_d:	dc.l	$10
 
@@ -136,5 +160,7 @@ ticks		ds.l	1
 paused:		ds.l	1
 p1_score:	ds.l	1
 p1_score_d:	ds.l	1
+p1_score_high:	ds.l	1
+p1_score_high_d:ds.l	1
 p1_gameover:	ds.l	1
 music_on:	ds.l	1
