@@ -17,10 +17,10 @@ main_menu_init:	movem.l	a0-a1,-(sp)
 		jsr	font_print
 		
 		adda.l	#(scr_w*16*2)-(txt_mm_play_l*8*2),a0
-		lea	txt_mm_diff,a1
+		lea	txt_mm_audio,a1
 		jsr	font_print
 		
-		adda.l	#(scr_w*16*2)-(txt_mm_diff_l*8*2),a0
+		adda.l	#(scr_w*16*2)-(txt_mm_audio_l*8*2),a0
 		lea	txt_mm_quit,a1
 		jsr	font_print
 		
@@ -167,15 +167,12 @@ mm_cur_off	dc.l	mm_cur_pos,mm_cur_pos+(2*scr_w*16),mm_cur_pos+(4*scr_w*16)
 		
 txt_mm_play	dc.b	'PLAY',0
 txt_mm_play_l	equ	4
-txt_mm_diff	dc.b	'SFX/BGM',0
-txt_mm_diff_l	equ	7
+txt_mm_audio	dc.b	'SFX/BGM',0
+txt_mm_audio_l	equ	7
 txt_mm_quit	dc.b	'QUIT',0
 txt_mm_quit_l	equ	4
 
 mm_count	equ	3
-
-txt_diff_easy	dc.b	'EASY',0
-txt_diff_medium	dc.b	'HARD',0
 
 mm_curr		ds.b	1
 mm_next		ds.b	1
