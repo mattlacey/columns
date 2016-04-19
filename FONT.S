@@ -20,15 +20,34 @@ font_pr_loop:	move.l	#0,d0			; a0 should hold screen adr
 		sub.b	#32,d0
 		jsr	font_char
 		adda.l	#16,a0
-		jmp	font_pr_loop
-		
+		jmp	font_pr_loop		
 
 font_pr_done:	movem.l	(sp)+,d0/a1
 		rts
 		
 		
 		
+
+font_print_l:	movem.l	d0-d1/a0-a1,-(sp)		; d0 should hold length
+		move.l	d0,d1
+
+font_prl_loop:	move.l	#0,d0			; a0 should hold screen adr
+		move.b	(a1)+,d0
+		cmp.b	#0,d0
+		beq	font_prl_done
 		
+		sub.b	#32,d0
+		jsr	font_char
+		adda.l	#16,a0
+		dbf	d1,font_prl_loop
+
+font_prl_done:	movem.l	(sp)+,d0-d1/a0-a1
+
+		rts
+		
+		
+		
+				
 font_bcd:	movem.l	d0/a1,-(sp)		; a0 should hold screen adr
 						; a1 should point to 32bit bcd
 		move.l	#0,d0
