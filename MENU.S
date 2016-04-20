@@ -141,22 +141,20 @@ main_menu_cur:
 
 		
 main_menu_draw:	movea.l	screen_adr,a0
-		adda.l	#scr_w*2*206+16,a0	; credits screen pos
+		adda.l	#scr_w*2*206,a0		; credits screen pos
 
 		lea	txt_credits,a1		; load credits addr		
 		moveq.l	#0,d0			
-		
-		move.b	mm_cred_soff,d0
-		add.l	d0,d0
-		suba.l	d0,a0			; offset screen pos
-		
+				
 		move.w	mm_cred_off,d0
 		cmp.l	#txt_credits_end-txt_credits,d0
 		blt	mm_draw_print
 		move.w	#0,mm_cred_off
 		
 mm_draw_print:	adda.l	d0,a1
-		move.l	#38,d0			; max offset from start
+		move.l	#37,d0			; max offset from start
+		moveq.l	#0,d1
+		move.b	mm_cred_soff,d1
 		jsr	font_print_l
 		
 		moveq.l	#0,d0			; inc offsets
@@ -170,16 +168,6 @@ mm_draw_print:	adda.l	d0,a1
 
 mm_draw_masks:	move.b	d0,mm_cred_soff		; update screen offset
 
-		movea.l	screen_adr,a0		; draw blank at ends of line
-		adda.l	#scr_w*2*206,a0		; credits screen pos
-		moveq.l	#0,d0
-		lea	txt_line_ends,a1
-		jsr	font_print_l
-		
-		adda.l	#scr_w*2-16,a0
-		lea	txt_line_ends,a1
-		jsr	font_print_l
-		
 		jsr	main_menu_cur
 
 		moveq.l	#0,d0			; for the first half of 
@@ -218,10 +206,8 @@ txt_mm_quit_l	equ	4
 mm_count	equ	3
 
 txt_credits	dc.b	'                                        TRIONOIDS BY @LACEYSNR.   GFX : MMACD / @LACEYSNR.   MUSIC : DROZERIX (MOD ARCHIVE ID 173935).   FRAMEWORK : DHS.    '
-txt_credits_2	dc.b	'   SPECIAL THANX : THADOS, GGN, DML, DEFJAM, CHRISTOS, RAGSTAFF AND #ATARISCNE.   GREETS TO MEMBERS OF MACE PAST & PRESENT.    ',0   
+txt_credits_2	dc.b	'   SPECIAL THANX : THADOS, GGN, DML, DEFJAM, WIETZE, CHRISTOS, RAGSTAFF AND #ATARISCNE.   GREETS TO MEMBERS OF MACE PAST & PRESENT.    ',0   
 txt_credits_end
-
-txt_line_ends	dc.b	'*',0
 
 mm_curr		ds.b	1
 mm_next		ds.b	1
