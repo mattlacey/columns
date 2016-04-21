@@ -29,6 +29,7 @@ font_pr_done:	movem.l	(sp)+,d0/a1
 		
 
 font_print_l:	movem.l	d0-d3/a0-a1,-(sp)	; d0 should hold length
+		subq.l	#1,d0			; length is dbf'd
 		move.l	d0,d2			
 		cmp.l	#0,d1			; d1 should hold char offset
 		beq	font_prl_loop
@@ -47,7 +48,7 @@ font_print_l:	movem.l	d0-d3/a0-a1,-(sp)	; d0 should hold length
 		adda.l	d3,a0			; add correct offset to screen addr 
 		
 		cmp.l	#0,d2			; check length after clip
-		beq	font_prl_done
+		beq	font_prl_last
 		subq.l	#1,d2
 
 font_prl_loop:	move.l	#0,d0			; a0 should hold screen adr
@@ -59,6 +60,17 @@ font_prl_loop:	move.l	#0,d0			; a0 should hold screen adr
 		jsr	font_char
 		adda.l	#16,a0
 		dbf	d2,font_prl_loop
+		
+font_prl_last:	cmp.l	#0,d1			; if we offset at the start
+		beq	font_prl_done		; we need to do part of an extra char
+
+		move.l	#0,d0			; check null term
+		move.b	(a1),d0
+		cmp.b	#0,d0
+		beq	font_prl_done
+		
+		sub.b	#32,d0
+		jsr	font_char_rc
 
 font_prl_done:	movem.l	(sp)+,d0-d3/a0-a1
 
@@ -145,7 +157,43 @@ font_clc_1:	move.w	(a1)+,(a0)+
 		
 		
 		
-				
+
+		; right clip char
+font_char_rc:	movem.l	d0-d5/a0-a1,-(sp)
+
+		lea	font_data,a1		; address of char data
+		lsl	#7,d0
+		lea	(a1,d0.l),a1
+		
+		moveq.l	#7,d3			; 8 lines of char
+		
+		moveq.l	#8,d4			; d1 is pixel count
+		sub.l	d1,d4			; d4 is remainder
+
+		move.l	d1,d5			; offset for screen
+		add.l	d5,d5			; on each line
+
+		subq.l	#1,d1			; sub for dbf
+		move.l	d1,d2			; remember limit
+		
+font_clr_1:	move.w	(a1)+,(a0)+
+		dbf	d1,font_clr_1
+		
+		adda.l	#scr_w*2,a0		; next line on screen
+		suba.l	d5,a0
+		
+		adda.l	d4,a1			; next line of char data
+		adda.l	d4,a1
+		
+		move.l	d2,d1			; recall limit
+		dbf	d3,font_clr_1		; next line
+		
+		movem.l	(sp)+,d0-d5/a0-a1
+		rts
+		
+		
+		
+						
 font_digit:	movem.l	d0/a0-a1,-(sp)
 		
 		or.b	#$10,d0			; index into digits

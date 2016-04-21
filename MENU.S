@@ -152,7 +152,7 @@ main_menu_draw:	movea.l	screen_adr,a0
 		move.w	#0,mm_cred_off
 		
 mm_draw_print:	adda.l	d0,a1
-		move.l	#37,d0			; max offset from start
+		move.l	#40,d0			; max offset from start
 		moveq.l	#0,d1
 		move.b	mm_cred_soff,d1
 		jsr	font_print_l
