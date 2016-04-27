@@ -1,43 +1,45 @@
 		section text
 
-grid_w:		equ	6
-grid_h:		equ	13
-grid_c:		equ	(grid_w*grid_h)
-grid_s:		equ	16
+grid_w		equ	6
+grid_h		equ	13
+grid_c		equ	(grid_w*grid_h)
+grid_s		equ	16
 
-grid_x:		equ	(320-(grid_s*grid_w))/2
-grid_y:		equ	16
+grid_x		equ	(320-(grid_s*grid_w))/2
+grid_y		equ	16
+
+grid_next_pos	equ	(((132*scr_w)+48)*2)
 
 ; offsets for vertical checks
-grid_dir_n:	equ	(grid_w)
-grid_dir_ne:	equ	(grid_w-1)
-grid_dir_nw:	equ	(grid_w+1)
+grid_dir_n	equ	(grid_w)
+grid_dir_ne	equ	(grid_w-1)
+grid_dir_nw	equ	(grid_w+1)
 grid_dir_w	equ	(1)
 
 ; masks, type is bits 0-2, flags are 3-8
-grid_type_mask:	equ	$7			; gem type mask
-grid_typep_mask:equ	$f			; type & player flag mask
-grid_xp_mask:	equ	$f7			; exclude fplayer mask
-grid_flag_mask:	equ	$f8			; gem flags mask
+grid_type_mask	equ	$7			; gem type mask
+grid_typep_mask	equ	$f			; type & player flag mask
+grid_xp_mask	equ	$f7			; exclude fplayer mask
+grid_flag_mask	equ	$f8			; gem flags mask
 
 ; flags
-grid_plr_f:	equ	$8			; player gem flag
-grid_clr_f:	equ	$10			; clear flag
-grid_fclr_f:	equ	$20			; force clear - still draws a gem
-grid_clr_both:	equ	$30
-grid_match_f:	equ	$40			; mask for match flag
-grid_static_f:	equ	$80			; for gems that haven't moved
+grid_plr_f	equ	$8			; player gem flag
+grid_clr_f	equ	$10			; clear flag
+grid_fclr_f	equ	$20			; force clear - still draws a gem
+grid_clr_both	equ	$30
+grid_match_f	equ	$40			; mask for match flag
+grid_static_f	equ	$80			; for gems that haven't moved
 
-grid_fast_on:	equ	$f
-grid_fast_off:	equ	0						
+grid_fast_on	equ	$f
+grid_fast_off	equ	0						
 
 
 ; flag bit numbers
-grid_plr_bit:	equ	3
-grid_clr_bit:	equ	4
-grid_fclr_bit:	equ	5
-grid_match_bit:	equ	6
-grid_static_bit:equ	7
+grid_plr_bit	equ	3
+grid_clr_bit	equ	4
+grid_fclr_bit	equ	5
+grid_match_bit	equ	6
+grid_static_bit equ	7
 
 
 
@@ -317,6 +319,26 @@ grid_rand_gem:	jsr	rand
 
 
 
+		; fills up the next 3 gems ready for spawning
+		; grid_ran_gem trashes a2!!
+grid_next_3:	movem.l	d0/a0-a2,-(sp)
+		lea	grid_plr,a1
+		
+		jsr	grid_rand_gem
+		move.b	d0,grid_plr_next(a1)	; store in the player struct
+		
+		jsr	grid_rand_gem
+		move.b	d0,grid_plr_next+1(a1)
+		
+		jsr	grid_rand_gem
+		move.b	d0,grid_plr_next+2(a1)
+		
+		movem.l	(sp)+,d0/a0-a2
+		rts
+		
+		
+		
+		
 grid_plr_spawn:	movem.l	d0/a0-a2,-(sp)
 
 		lea	grid,a0			; find spawn pos
@@ -336,16 +358,22 @@ grid_ps1:	lea	grid_plr,a1
 		move.l	a0,grid_plr_a(a1)	; address of base gem
 		move.l	#15,grid_plr_y_off(a1)	; offset to 0
 		
-		jsr	grid_rand_gem
+		moveq.l	#0,d0
+		
+		move.b	grid_plr_next(a1),d0		
 		or.b	#grid_plr_f,d0
 		move.b	d0,(a0)			; update the grid
 		
-		jsr	grid_rand_gem		; store the two that will
+		move.b	grid_plr_next+1(a1),d0
 		or.b	#grid_plr_f,d0
 		move.b	d0,grid_plr_g2(a1)	; appear next so the player
-		jsr	grid_rand_gem		; can still rotate through
+		
+		move.b	grid_plr_next+2(a1),d0	; can still rotate through
 		or.b	#grid_plr_f,d0
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
+		
+		jsr	grid_next_3		; setup the next 3 gems
+		jsr	grid_draw_next		; draw them... bad place?
 	
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
@@ -723,29 +751,13 @@ gc3_noop:	movem.l	(sp)+,d0/d6/a0-a2
 
 
 
-grid_draw:	; draw fixed gems to screen
+grid_draw:	; draw gems to screen
 		movem.l	d0-d7/a0-a5,-(sp)
 		
 		lea	grid_plr,a2
 		moveq.l	#0,d0
 		move.l	grid_plr_y_off(a2),d0
-		move.l	d0,d5
-;		movea.l	screen_adr,a0
-;		adda.l	#scr_w*16*2,a0
-;		jsr	font_digit
-		
-;		moveq.l	#0,d0
-;		move.b	grid_matched,d0
-;		adda.l	#scr_w*16*2,a0
-;		jsr	font_digit
-		
-;		moveq.l	#0,d0
-;		move.b	grid_stable,d0
-;		adda.l	#scr_w*16*2,a0
-;		jsr	font_digit
-		
-		
-		
+		move.l	d0,d5			; keep the offset
 		
 		lea	grid,a2
 		
@@ -940,10 +952,8 @@ dg_next:
 
 
 
-dg_drawbg:	
-		movem.l	d0/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
+dg_drawbg:	movem.l	d0/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
 						; offset based on a0-screen_adr
-
 		lea	background,a1
 		move.l	a0,d0
 		sub.l	screen_adr,d0
@@ -970,7 +980,54 @@ dg_drawbg:
 
 
 
-
+grid_draw_next:	movem.l	d0-d2/a0-a3,-(sp)
+		
+		move.l	#scr_w*16*2,d2		; offset for each square
+		movea.l	screen_adr,a0
+		adda.l	#grid_next_pos,a0
+		move.l	a0,a3
+				
+		lea	grid_plr,a1
+		moveq.l	#0,d0
+		lea	grid_spr_firsts,a2	; map of sprites
+		
+		move.b	grid_plr_next+2(a1),d0	; find the right entry in the main
+		cmp.b	#0,d0
+		beq	gdn_done
+		
+		lsl	#2,d0			; index into sprite map
+		adda.l	d0,a2
+		move.l	(a2),a2			; draw bg then sprite!
+		jsr	dg_drawbg
+		jsr	(a2)
+		adda.l	d2,a3			; screen offset
+		move.l	a3,a0
+		
+		move.b	grid_plr_next+1(a1),d0	; get the next gem
+		lsl	#2,d0			
+		lea	grid_spr_firsts,a2
+		adda.l	d0,a2
+		move.l	(a2),a2
+		jsr	dg_drawbg			
+		jsr	(a2)
+		adda.l	d2,a3
+		move.l	a3,a0
+		
+		move.b	grid_plr_next(a1),d0	; and the last
+		lsl	#2,d0		
+		lea	grid_spr_firsts,a2
+		adda.l	d0,a2
+		move.l	(a2),a2
+		jsr	dg_drawbg		
+		jsr	(a2)
+		
+				
+gdn_done:	movem.l	(sp)+,d0-d2/a0-a3
+		rts
+		
+		
+		
+		
 grid_bg_full:	movem.l	d0-d1/a0-a1,-(sp)		; draw 16 lines of bg above
 
 		lea	background,a1		; current position ofset based
@@ -1010,6 +1067,10 @@ gdg1:		lsl	#2,d0
 
 	section	data
 
+
+grid_spr_maps	dc.l	0,red_map,yellow_map,purple_map,green_map,blue_map
+grid_spr_firsts	dc.l	0,red0,yellow0,purple0,green0,blue0
+
 grid_i_speed	dc.l	1	; initial speed
 grid_i_delay	dc.l	2
 grid_x_speed	dc.b	4
@@ -1020,7 +1081,7 @@ grid_randoms	dc.b	0,1,2,3,4,0,1,2,3,4,0,1,2,3,4,99
 	section bss
 		
 
-grid_plr_s	equ	12
+grid_plr_s	equ	16
 		
 		rsreset
 grid_plr_y_off	rs.l	1	; current-y-offset (change to byte?)
@@ -1028,6 +1089,8 @@ grid_plr_x	rs.b	1	; coords of bottom gem
 grid_plr_y	rs.b	1
 grid_plr_g2	rs.b	1	; 2nd and 3rd gem generated on spawn
 grid_plr_g3	rs.b	1	; need them ready for rotation
+grid_plr_next	rs.b	3	; next 3 gems (used for display)
+grid_plr_res	rs.b	1	; reserved
 grid_plr_a	rs.l	1	; current address of bottom gem
 
 
