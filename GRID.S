@@ -872,6 +872,8 @@ dg_match:	; gems have been matched to do animations
 
 		and.b	#grid_type_mask,d4
 
+		; REPLACE THIS MESS WITH A JUMP TABLE!
+
 dgm_red:	cmp.b	#1,d4
 		bne	dgm_yellow
 		move.l	#red_map,a3
@@ -945,8 +947,22 @@ dg_clear:
 
 dg_next:		
 		dbf	d2,dg1
+		
+		
+		lea.l	grid_plr,a2		; if the player is on the first
+		cmp.b	#2,grid_plr_y(a2)	; 3 rows the bg needs to be cleared
+		bgt	dg_done			; above to clip the player gems
 
-		movem.l	(sp)+,d0-d7/a0-a5
+dg_brk:		move.l	screen_adr,a0
+		moveq.l	#0,d0
+		move.b	grid_plr_x(a2),d0	; x-pos
+		lsl.l	#5,d0			; * 16
+		adda.l	d0,a0
+		adda.l	#grid_x*2,a0
+		
+		jsr	dg_drawbg
+
+dg_done:	movem.l	(sp)+,d0-d7/a0-a5
 		rts
 
 
@@ -1024,33 +1040,10 @@ grid_draw_next:	movem.l	d0-d2/a0-a3,-(sp)
 				
 gdn_done:	movem.l	(sp)+,d0-d2/a0-a3
 		rts
+			
 		
 		
-		
-		
-grid_bg_full:	movem.l	d0-d1/a0-a1,-(sp)		; draw 16 lines of bg above
-
-		lea	background,a1		; current position ofset based
-		move.l	a0,d0			; on a0 - screen_adr
-		sub.l	screen_adr,d0
-		adda.l	d0,a1
-		
-		move.l	#grid_s*grid_h,d0
-grid_bg_l1:
-		REPT	grid_s*grid_w/2
-		move.l	(a1)+,(a0)+
-		ENDR		
-		
-		adda.l	#scr_w*2-grid_w*grid_s*2,a0
-		adda.l	#scr_w*2-grid_w*grid_s*2,a1
-		
-		dbf	d0,grid_bg_l1				
-
-		movem.l	(sp)+,d0-d1/a0-a1
-		rts
-
-
-
+				
 grid_draw_gem:					; draws gem sprite from
 		cmp.l	#8,d0			; map in a3, using frame
 		blt	gdg1			; in d0
