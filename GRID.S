@@ -700,7 +700,7 @@ gm_noinc:
 		move.l	#8,grid_timer
 		cmp.b	#1,grid_matched
 		bne	match_skip
-		addq.l	#8,grid_timer
+		add.l	#24,grid_timer
 		move.l	#grid_fast_on,grid_fast
 			
 match_skip:	movem.l	(sp)+,d0-d6/a0-a3
@@ -859,10 +859,11 @@ dg_jump:
 dg_match:	; gems have been matched to do animations
 
 		move.l	a1,a0			; get anim frame
-		move.l	#16,d0		 
+		move.l	#32,d0		 
 		sub.l	grid_timer,d0
-		cmp.l	#8,d0			; only have 8 frames
+		cmp.l	#17,d0			; only have 8 frames
 		bgt	dg_clear
+		lsr	#1,d0
 		
 		jsr	dg_drawbg
 		move.l	a1,a0
