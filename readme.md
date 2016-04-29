@@ -1,12 +1,17 @@
 Columns
 ===
 
-THis is a work-in-progress columns clone for the Atari Falcon030. It may be ported to the ST, right now it's using the Falcon's true colour mode despite only using 6 or so colours. 
+This is an almost-complete columns clone for the Atari Falcon030. It may be ported to the ST, right now it's using the Falcon's true colour mode so a lot of the graphis routines and assets would have to be changed for that to happen.
 
-This is my first major assembly project so there's plenty of code that's nowhere near optimised. There's plenty to clean up and fix, and more to implement.
+This is my first major assembly project so there's plenty of code that's nowhere near optimised, and even more that's absolutely horrible in terms of design. I've learned a lot, especially about how hard refactoring assembly code is ;)
 
-There's also some extra junk for doing simple sprites and tiles because I was thinking about making a shooter at first, that may be used for something in this at some stage.
+This code should assemble without issue in Devpac 3.1.
 
+Known bugs
+===
+
+* Occasionally gems won't be cleared properly - restarting the game will fix this
+* Sound effects don't always work
 
 Thanks
 ===
