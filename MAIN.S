@@ -253,6 +253,7 @@ blackpal:	lea.l	$ffff9800.w,a0				;black palette
 		endc								;
 
 		include 'gfx.s'
+		include	'data\gamovrbx.s'
 		include 'backgrnd.s'
 		include 'grid.s'
 		include 'joy.s'

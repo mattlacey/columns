@@ -6,11 +6,37 @@
 game_pre_init:	move.l	#0,p1_score_high
 		move.l	#0,p1_score_high_d
 		
+		; see if high scores file exists
+		move.w	#0,-(sp)				;fsfirst() get fileinfo
+		move.l	#file_scores,-(sp)			
+		move.w	#$4e,-(sp)				
+		trap	#1					
+		addq.l	#8,sp					
+
+		tst.l	d0					
+		beq.s	game_p_load
+		
+		; nope, so create it
+		move.w	#0,-(sp)
+		move.l	filename,-(sp)
+		move.w	#$3c,-(sp)
+		trap	#1
+		addq.l	#8,sp
+		move.w	d0,filenumber				; in Loader.s
+		
+		; and close it
+		move.w	filenumber,-(sp)			;filenumber for closing
+		move.w	#$3e,-(sp)				;
+		trap	#1					;
+		addq.l	#4,sp					;
+		bra	game_p_done
+ 		
+		
 		; load high scores if they exist
-		move.l	#file_scores,filename.l
+game_p_load:	move.l	#file_scores,filename.l
 		move.l	#p1_score_high,filebuffer.l
 		jsr	loader
-		
+game_p_done:		
 		rts
 
 
@@ -87,20 +113,26 @@ game_draw_scr:	movem.l	a0-a1,-(sp)
 
 
 game_over_loop:	; game over so print text and do sweet fa
+		
+		movea.l	screen_adr,a0
+		adda.l	#bg_gameover_p,a0
+		jsr	BG_gamovrbx
+
+
 		movea.l	screen_adr,a0
 		adda.l	#txt_gameover_p,a0
 		lea	txt_gameover,a1
 		jsr	font_print
 		
-		movea.l	screen_adr,a0
-		adda.l	#txt_score_p,a0
-		lea	txt_score,a1
-		jsr	font_print
+		;movea.l	screen_adr,a0
+		;adda.l	#txt_score_p,a0
+		;lea	txt_score,a1
+		;jsr	font_print
 
-		movea.l	screen_adr,a0
-		adda.l	#txt_score_p2,a0
-		lea	p1_score_d,a1
-		jsr	font_bcd
+		;movea.l	screen_adr,a0
+		;adda.l	#txt_score_p2,a0
+		;lea	p1_score_d,a1
+		;jsr	font_bcd
 		
 		jsr	joy_update					
 		moveq.l	#0,d0				; move on on fire
@@ -146,7 +178,8 @@ file_scores	dc.b	'data\score.dat',0
 		
 txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
 txt_gameover	dc.b	'* GAME OVER *',0
-txt_gameover_p	equ	(2*scr_w*116+(scr_w-13*8))	; screen offset
+txt_gameover_p	equ	(2*scr_w*73+(scr_w-13*8))	; screen offset
+bg_gameover_p	equ	(2*scr_w*67)
 
 txt_score	dc.b	'YOUR SCORE:',0
 txt_score_p	equ	(2*scr_w*124+(scr_w-11*8))	; screen offset
