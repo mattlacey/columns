@@ -1,4 +1,4 @@
-		section text
+		section text 
 
 grid_w		equ	6
 grid_h		equ	13
@@ -51,6 +51,7 @@ grid_init:	movem.l	d0/a0,-(sp)
 		move.l	grid_i_speed,grid_speed
 		move.l	grid_i_delay,grid_delay
 		move.l	grid_i_delay,grid_timer
+		move.l	#0,grid_ticks
 		move.l	#grid_fast_off,grid_fast
 		
 		move.b	#0,grid_inpt_rot
@@ -61,6 +62,8 @@ grid_init:	movem.l	d0/a0,-(sp)
 		lea	grid,a0
 ig1:		move.b	#0,(a0)+
 		dbf	d0,ig1
+		
+		jsr	grid_next_3
 		
 		move.b	#0,grid_matched
 		move.b	#1,grid_stable
@@ -94,37 +97,6 @@ grid_test:	movem.l a0,-(sp)
 		movem.l	(sp)+,a0
 		rts
 		
-
-
-
-grid_random:	; intialises d0 rows to random
-		; colours
-
-		movem.l d0-d2/a0,-(sp)
-
-		; number of squares to set
-		move.l	d0,d1
-		mulu.l	#grid_w,d1
-		sub.l	#1,d1
-
-		lea	grid,a0
-
-rg1:		jsr	rand
-		and.l	#3,d0
-
-		move.b	d0,(a0)+
-
-		;addq.l	#1,d0
-		;and.l	#3,d0
-
-		dbf	d1,rg1
-		
-		move	#0,grid_stable
-
-
-		movem.l	(sp)+,d0-d2/a0		
-		rts
-
 
 
 
@@ -361,7 +333,7 @@ grid_ps1:	lea	grid_plr,a1
 		moveq.l	#0,d0
 		
 		move.b	grid_plr_next(a1),d0		
-		or.b	#grid_plr_f,d0
+gps1test:	or.b	#grid_plr_f,d0
 		move.b	d0,(a0)			; update the grid
 		
 		move.b	grid_plr_next+1(a1),d0
@@ -388,9 +360,14 @@ grid_ps_done:	movem.l	(sp)+,d0/a0-a2
 grid_update:	movem.l	d0-d5/a0-a3,-(sp)
 
 		; update speed if required
-		cmp.l	#10,grid_match_c
+		move.l	grid_ticks,d0
+		addq.l	#1,d0
+		move.l	d0,grid_ticks
+		
+		cmp.l	#3600,d0		; check time
 		blt	grid_spawn_chk
-		sub.l	#10,grid_match_c
+		
+		move.l	#0,grid_ticks		; reset
 		
 		; first decrease the delay, then adjust speed
 		cmp.l	#1,grid_delay
@@ -1066,7 +1043,7 @@ grid_spr_maps	dc.l	0,red_map,yellow_map,purple_map,green_map,blue_map
 grid_spr_firsts	dc.l	0,red0,yellow0,purple0,green0,blue0
 
 grid_i_speed	dc.l	1	; initial speed
-grid_i_delay	dc.l	2
+grid_i_delay	dc.l	4
 grid_x_speed	dc.b	4
 
 
@@ -1098,6 +1075,7 @@ grid_inpt_drop	ds.b	1	; for rotation and dropping
 
 grid_speed	ds.l	1
 grid_delay	ds.l	1
+grid_ticks	ds.l	1
 
 grid_fast	ds.l	1
 grid_match_c	ds.l	1
