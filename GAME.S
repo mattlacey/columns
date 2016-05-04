@@ -52,7 +52,6 @@ game_init:	movem.l	d0-a6,-(sp)
 		move.l	#0,p1_score_d
 		move.l	#0,p1_gameover
 		
-
 		; start the game!
 		move.l	#seq_gameloop,current_fx
 		
@@ -63,7 +62,6 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 game_loop:	movem.l	a0-a1,-(sp)
-		addq.l	#1,ticks
 		
 		jsr	grid_draw
 		jsr	game_draw_scr
@@ -123,17 +121,7 @@ game_over_loop:	; game over so print text and do sweet fa
 		adda.l	#txt_gameover_p,a0
 		lea	txt_gameover,a1
 		jsr	font_print
-		
-		;movea.l	screen_adr,a0
-		;adda.l	#txt_score_p,a0
-		;lea	txt_score,a1
-		;jsr	font_print
-
-		;movea.l	screen_adr,a0
-		;adda.l	#txt_score_p2,a0
-		;lea	p1_score_d,a1
-		;jsr	font_bcd
-		
+				
 		jsr	joy_update					
 		moveq.l	#0,d0				; move on on fire
 		move.b	joy1fire,d0
@@ -176,14 +164,9 @@ game_over:	move.l	#1,p1_gameover
 
 file_scores	dc.b	'data\score.dat',0
 		
-txt_welcome	dc.b	'WELCOME TO MARS. ENJOY YOUR STAY :)',0
 txt_gameover	dc.b	'* GAME OVER *',0
 txt_gameover_p	equ	(2*scr_w*73+(scr_w-13*8))	; screen offset
 bg_gameover_p	equ	(2*scr_w*67)
-
-txt_score	dc.b	'YOUR SCORE:',0
-txt_score_p	equ	(2*scr_w*124+(scr_w-11*8))	; screen offset
-txt_score_p2	equ	(2*scr_w*132+(scr_w-9*8))	; screen offset
 
 curr_sc_pos:	equ	(2*scr_w*200+44)
 high_sc_pos:	equ	(2*scr_w*200+466)
@@ -194,7 +177,6 @@ p1_scr_inc_d:	dc.l	$10
 		section bss
 
 ; game variables
-ticks		ds.l	1
 paused:		ds.l	1
 p1_score:	ds.l	1
 p1_score_d:	ds.l	1
