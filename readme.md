@@ -1,7 +1,7 @@
 Trionoids
 ===
 
-This is columns clone for the Atari Falcon030. It may be ported to the ST, right now it's using the Falcon's true colour mode so a lot of the graphis routines and assets would have to be changed for that to happen.
+This is columns clone for the Atari Falcon030. It may be ported to the ST, right now it's using the Falcon's true colour mode so a lot of the graphics routines and assets would have to be changed for that to happen.
 
 How To Play
 ===
