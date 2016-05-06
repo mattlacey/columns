@@ -38,6 +38,20 @@ bg_draw:	movem.l	a0-a1,-(sp)
 
 
 
+bg_draw_bb:	movem.l	a0-a1,-(sp)
+		lea	background,a0
+		movea.l	screen_adr1,a1
+		jsr	full_screen
+		
+		lea	background,a0
+		movea.l	screen_adr2,a1
+		jsr	full_screen
+		movem.l	(sp)+,a0-a1
+		rts
+		
+		
+		
+		
 bg_16x16:	; 100% UNTESTED!!!!!!!
 		movem.l	d1/a0-a1,-(sp)		; draw 16x16 of bg at d0,d1
 						; to screen
