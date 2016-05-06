@@ -46,11 +46,19 @@ game_init:	movem.l	d0-a6,-(sp)
 	
 		jsr	bg_load_game
 		jsr	bg_draw
+		
 		jsr	grid_init
 				
 		move.l	#0,p1_score
 		move.l	#0,p1_score_d
 		move.l	#0,p1_gameover
+		move.l	#1,p1_score_upd
+		
+		movea.l	screen_adr,a0
+		adda.l	#high_sc_pos,a0
+		lea	p1_score_high_d,a1
+		jsr	font_bcd
+		
 		
 		; start the game!
 		move.l	#seq_gameloop,current_fx
@@ -61,14 +69,15 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 
-game_loop:	movem.l	a0-a1,-(sp)
+game_loop:	jsr	grid_draw
 		
-		jsr	grid_draw
+		cmp.l	#0,p1_score_upd
+		beq	game_loop_upd
 		jsr	game_draw_scr
-		jsr	grid_update
+
+game_loop_upd:	jsr	grid_update
 			
-game_loop_done:	movem.l	(sp)+,a0-a1
-		rts
+game_loop_done:	rts
 		
 		
 		
@@ -87,6 +96,8 @@ game_inc_scr:	movem.l	d0/a0-a1,-(sp)
 		abcd	-(a0),-(a1)
 		abcd	-(a0),-(a1)		
 		
+		move.l	#1,p1_score_upd
+		
 		movem.l	(sp)+,d0/a0-a1
 		rts		
 
@@ -99,10 +110,7 @@ game_draw_scr:	movem.l	a0-a1,-(sp)
 		lea	p1_score_d,a1
 		jsr	font_bcd
 		
-		movea.l	screen_adr,a0
-		adda.l	#high_sc_pos,a0
-		lea	p1_score_high_d,a1
-		jsr	font_bcd
+		move.l	#0,p1_score_upd
 		
 		movem.l	(sp)+,a0-a1
 		rts
@@ -182,5 +190,6 @@ p1_score:	ds.l	1
 p1_score_d:	ds.l	1
 p1_score_high:	ds.l	1
 p1_score_high_d:ds.l	1
+p1_score_upd:	ds.l	1
 p1_gameover:	ds.l	1
 music_on:	ds.l	1
