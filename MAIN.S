@@ -129,12 +129,9 @@ mainloop:
 .nocpu:
 		endc
 		
-		cmp.b	#$39,$fffffc02.w			;exit
 		bra	mainloop
 		
-		bne.w	mainloop
-		bra.w	exit					;
-
+		
 .var:		ds.w	1
 
 
