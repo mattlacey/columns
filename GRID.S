@@ -41,16 +41,10 @@ grid_fclr_bit	equ	5
 grid_match_bit	equ	6
 grid_static_bit equ	7
 
-; enum for various states
-grid_state_s1	equ	1
-grid_state_s2	equ	2
-grid_state_c1	equ	3
-grid_state_c2	equ	4
 
 
 
-
-grid_init:	movem.l	d0/a0-a1,-(sp)
+grid_init:	movem.l	d0/a0-a2,-(sp)
 		
 		; initialise grid variables
 		move.l	#0,grid_match_c
@@ -66,9 +60,11 @@ grid_init:	movem.l	d0/a0-a1,-(sp)
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
 		lea	grid,a0			; gems and flags
-		lea	grid_state,a1		; render state of cells
+		lea	grid_st_draw,a1		; render state of cells
+		lea	grid_st_clear,a2
 ig1:		move.b	#0,(a0)+
 		move.b	#0,(a1)+
+		move.b	#0,(a2)+
 		dbf	d0,ig1
 		
 		jsr	grid_next_3
@@ -80,7 +76,7 @@ ig1:		move.b	#0,(a0)+
 		move.l	#0,grid_plr_prev
 		move.l	#0,grid_plr_prev+4
 	
-		movem.l	(sp)+,d0/a0-a1
+		movem.l	(sp)+,d0/a0-a2
 		rts
 
 
@@ -370,7 +366,7 @@ grid_ps_done:	movem.l	(sp)+,d0/a0-a2
 
 
 
-grid_update:	movem.l	d0-d5/a0-a4,-(sp)
+grid_update:	movem.l	d0-d5/a0-a5,-(sp)
 
 		; update speed if required
 		move.l	grid_ticks,d0
@@ -483,17 +479,19 @@ gu_init:	; pre-processing before the main update
 		; buffering so logic can be run every frame
 
 		lea	grid,a0
-		lea	grid_state,a4
+		lea	grid_st_clear,a5
 		
 		move.l	#grid_c-1,d0
 		
 gu_init_loop:	btst	#grid_match_bit,(a0)	; check for match
 		beq	gu_init_clear		
 		move.b	#grid_clr_f,(a0)+	; found, set clear
+		;move.b	#2,(a5)+
 		dbf	d0,gu_init_loop
 		bra	gu_init_done
 		
 gu_init_clear:	and.b	#grid_typep_mask,(a0)+	; clear flags except for
+		;adda.l	#1,a5
 		dbf	d0,gu_init_loop		; player flag
 		bra	gu_init_done
 
@@ -507,10 +505,12 @@ gu_init_done:
 		move.b	#1,grid_stable		; reset stable flag
 
 		lea	grid,a0			; grid data
-		lea	grid_state,a4		; grid render state
+		lea	grid_st_draw,a4		; grid render state
+		lea	grid_st_clear,a5	; grid clear state
 		
 		adda.l	#grid_c-1,a0
 		adda.l	#grid_c-1,a4
+		adda.l	#grid_c-1,a5
 		
 		move.l	#grid_w*(grid_h-1)-1,d0
 		
@@ -526,15 +526,10 @@ gu_loop:	moveq.l	#0,d3
 		and.b	#grid_type_mask,d3	; type of gem in d3
 
 		cmp.b	#0,d3
-		beq	gu_empty		; skip filled squares
-		
-		btst	#grid_plr_bit,d3	; and if they're not player
-		bne	gu_skip
-		
-		move.b	grid_state_s1,(a4)	; flag as static
+		beq	gu_empty		; skip filled squares		
 		bra	gu_skip
 		
-gu_empty	move.l	a0,a1			; get square above
+gu_empty:	move.l	a0,a1			; get square above
 		suba.l	#grid_w,a1		; address into a1 
 
 		moveq.l	#0,d4
@@ -557,12 +552,16 @@ gu_l1:		and.b	#grid_type_mask,d4	; type of above in d4
 		move.b	d4,(a0)			; with the player flag bit
 		or.b	#grid_fclr_f,(a0)	; force clear before draw
 		move.b	#grid_clr_f,(a1)	; and set above to 0 with clear
+		move.b	#2,(a5-grid_w)		
+;s		move.b	#0,(a5)			; remove clear
+		move.b	#2,(a4)			; draw over two frames
 		
 gu_l2:		move.b	#0,grid_stable		; clear stable flag
 		
 gu_skip:	
 		suba.l	#1,a0
 		suba.l	#1,a4
+		suba.l	#1,a5
 		dbf	d0,gu_loop
 	
 
@@ -607,7 +606,7 @@ gu_spawn:	jsr	sfx_drop
 gu_unstable:	jsr	grid_plr_inc_y		; otherwise increment player y		
 
 gu_done:	
-		movem.l (sp)+,d0-d5/a0-a4
+		movem.l (sp)+,d0-d5/a0-a5
 		rts
 
 
@@ -764,15 +763,15 @@ grid_draw:	; draw gems to screen
 		move.l	d0,d5			; keep the offset
 		
 		lea	grid,a2
+		lea	grid_st_draw,a4
+		lea	grid_st_clear,a5	
 		
 		movea.l	screen_adr,a1		; start of grid in buffer
 		adda.l	#grid_x*2,a1
 		adda.l	#grid_y*scr_w*2,a1
-		move.l	a1,a4
 
 		move.l	screen_adr,a0		; clear player gems from
 		move.l	grid_plr_prev+4,d0	; previous location
-		;move.l	grid_plr_prev,d0	; (single buffer version)
 		cmp.l	#0,d0
 		beq	dg_loop_init		
 		
@@ -803,15 +802,20 @@ dg_loop_init:	; update offset buffer (if double buffering)
 
 dg1:
 		move.b	(a2),d4			; get gem in d4
-
-		btst	#grid_clr_bit,d4	; need to clear?
-		bne	dg_bg
-				
-		btst	#grid_match_bit,d4	; matched?
-		bne	dg_match
-						
 		movea.l	a1,a0
 
+		;btst	#grid_clr_bit,d4	; need to clear?
+		;bne	dg_bg
+		
+		cmp.b	#0,(a5)
+		beq	dg_chk_match
+		subq.b	#1,(a5)
+		jsr	dg_drawbg
+
+				
+dg_chk_match:	btst	#grid_match_bit,d4	; matched?
+		bne	dg_match
+						
 		btst	#grid_plr_bit,d4	; player gem? add offset	
 		beq	dg_clear_chk		; gem is offset from above
 						; unless the grid is stable
@@ -832,14 +836,14 @@ dg1:
 		bra	dg_type
 		
 dg_clear_chk:	btst	#grid_fclr_bit,d4	; clear bg if force flag
-		beq	dg_static		; is set
+		beq	dg_draw_chk		; is set
 		jsr	dg_drawbg	
 		movea.l	a1,a0
 		bra	dg_type
 		
-dg_static:	cmp.b	#0,(ax)			; two frames of static
+dg_draw_chk:	cmp.b	#0,(a4)			; two frames of draw for static
 		beq	dg_clear
-		subq.b	#1,(ax)
+		subq.b	#1,(a4)
 		
 dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#0,d4
@@ -883,6 +887,8 @@ dg_bg:		move.l	a1,a0
 	
 dg_clear:
 		adda.l	#1,a2			; next square
+		adda.l	#1,a4			; next in state buffers
+		adda.l	#1,a5		
 		adda.l	#grid_s*2,a1		; next screen pos
 
 		addq.l	#1,d3			; end of row?
@@ -1099,7 +1105,8 @@ grid_matched	ds.b	1
 
 grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
-grid_state	ds.b	grid_w*grid_h
+grid_st_draw	ds.b	grid_w*grid_h		; draw state
+grid_st_clear	ds.b	grid_w*grid_h		; clear state
 grid_stable	ds.b	1
 
 	section	text
