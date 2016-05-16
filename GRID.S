@@ -41,10 +41,16 @@ grid_fclr_bit	equ	5
 grid_match_bit	equ	6
 grid_static_bit equ	7
 
+; enum for various states
+grid_state_s1	equ	1
+grid_state_s2	equ	2
+grid_state_c1	equ	3
+grid_state_c2	equ	4
 
 
 
-grid_init:	movem.l	d0/a0,-(sp)
+
+grid_init:	movem.l	d0/a0-a1,-(sp)
 		
 		; initialise grid variables
 		move.l	#0,grid_match_c
@@ -59,8 +65,10 @@ grid_init:	movem.l	d0/a0,-(sp)
 		
 		; clear grid to zero
 		move.l	#grid_c-1,d0	
-		lea	grid,a0
+		lea	grid,a0			; gems and flags
+		lea	grid_state,a1		; render state of cells
 ig1:		move.b	#0,(a0)+
+		move.b	#0,(a1)+
 		dbf	d0,ig1
 		
 		jsr	grid_next_3
@@ -72,7 +80,7 @@ ig1:		move.b	#0,(a0)+
 		move.l	#0,grid_plr_prev
 		move.l	#0,grid_plr_prev+4
 	
-		movem.l	(sp)+,d0/a0
+		movem.l	(sp)+,d0/a0-a1
 		rts
 
 
@@ -362,7 +370,7 @@ grid_ps_done:	movem.l	(sp)+,d0/a0-a2
 
 
 
-grid_update:	movem.l	d0-d5/a0-a3,-(sp)
+grid_update:	movem.l	d0-d5/a0-a4,-(sp)
 
 		; update speed if required
 		move.l	grid_ticks,d0
@@ -475,6 +483,8 @@ gu_init:	; pre-processing before the main update
 		; buffering so logic can be run every frame
 
 		lea	grid,a0
+		lea	grid_state,a4
+		
 		move.l	#grid_c-1,d0
 		
 gu_init_loop:	btst	#grid_match_bit,(a0)	; check for match
@@ -496,8 +506,12 @@ gu_init_skip:	dbf	d0,gu_init_loop
 gu_init_done:	
 		move.b	#1,grid_stable		; reset stable flag
 
-		lea	grid,a0
+		lea	grid,a0			; grid data
+		lea	grid_state,a4		; grid render state
+		
 		adda.l	#grid_c-1,a0
+		adda.l	#grid_c-1,a4
+		
 		move.l	#grid_w*(grid_h-1)-1,d0
 		
 		lea	grid_plr,a2		; update player offset
@@ -517,11 +531,7 @@ gu_loop:	moveq.l	#0,d3
 		btst	#grid_plr_bit,d3	; and if they're not player
 		bne	gu_skip
 		
-instead of flagging as static let's maintain a static grid
-then a count of 2 can result in a flag to static and should 
-be able to indicate clears too
-		
-		or.b	#grid_static_f,(a0)	; gems then flag as static
+		move.b	grid_state_s1,(a4)	; flag as static
 		bra	gu_skip
 		
 gu_empty	move.l	a0,a1			; get square above
@@ -552,9 +562,11 @@ gu_l2:		move.b	#0,grid_stable		; clear stable flag
 		
 gu_skip:	
 		suba.l	#1,a0
+		suba.l	#1,a4
 		dbf	d0,gu_loop
 	
-		; after loop
+
+		; after main update loop
 		
 		lea	grid_plr,a0		; see if player gems have dropped
 		cmp.l	#16,grid_plr_y_off(a0)	
@@ -571,6 +583,11 @@ gu_skip:
 						; player gems
 gu_s_loop:	btst	#grid_plr_bit,(a0)
 		beq	gu_s_loop_s
+		
+;**************
+;**************
+;Clear static state here?
+
 		and.b	#$77,(a0)		
 
 gu_s_loop_s:	addq.l	#1,a0
@@ -590,7 +607,7 @@ gu_spawn:	jsr	sfx_drop
 gu_unstable:	jsr	grid_plr_inc_y		; otherwise increment player y		
 
 gu_done:	
-		movem.l (sp)+,d0-d5/a0-a3
+		movem.l (sp)+,d0-d5/a0-a4
 		rts
 
 
@@ -820,9 +837,9 @@ dg_clear_chk:	btst	#grid_fclr_bit,d4	; clear bg if force flag
 		movea.l	a1,a0
 		bra	dg_type
 		
-dg_static:	btst	#grid_static_bit,d4	; static?
-		bne	dg_clear
-
+dg_static:	cmp.b	#0,(ax)			; two frames of static
+		beq	dg_clear
+		subq.b	#1,(ax)
 		
 dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#0,d4
