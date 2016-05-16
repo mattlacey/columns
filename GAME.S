@@ -73,8 +73,7 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 
-game_loop:	; jsr	grid_clear
-		jsr	grid_draw
+game_loop:	jsr	grid_draw
 		
 		cmp.l	#0,p1_score_upd
 		beq	game_loop_upd
