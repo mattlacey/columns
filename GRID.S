@@ -203,12 +203,12 @@ grid_plr_rot:	movem.l	d1/a0-a1,-(sp)		; rotates the player gems
 		move.b	grid_plr_g3(a0),(a1)
 		move.b	grid_plr_g2(a0),grid_plr_g3(a0)
 		move.b	d1,grid_plr_g2(a0)
-		jmp	grid_rot_done		
+		bra	grid_rot_done		
 
 grid_rot_l1d:	move.b	grid_plr_g2(a0),(a1)
 		move.b	grid_plr_g3(a0),grid_plr_g2(a0)
 		move.b	d1,grid_plr_g3(a0)
-		jmp	grid_rot_done
+		bra	grid_rot_done
 		
 		
 grid_rot_l2:	; on line two, two gems on screen
@@ -217,12 +217,12 @@ grid_rot_l2:	; on line two, two gems on screen
 		move.b	grid_plr_g3(a0),(a1)
 		move.b	(a1-grid_w),grid_plr_g3(a0)
 		move.b	d1,(a1-grid_w)
-		jmp	grid_rot_done
+		bra	grid_rot_done
 
 grid_rot_l2d:	move.b	(a1-grid_w),(a1)
 		move.b	grid_plr_g3(a0),(a1-grid_w)
 		move.b	d1,grid_plr_g3(a0)	
-		jmp	grid_rot_done
+		bra	grid_rot_done
 		
 		
 grid_rot_std:	; standard case, rotate in the grid
@@ -231,7 +231,7 @@ grid_rot_std:	; standard case, rotate in the grid
 		move.b	(a1-grid_w*2),(a1)
 		move.b	(a1-grid_w),(a1-grid_w*2)
 		move.b	d1,(a1-grid_w)	
-		jmp	grid_rot_done
+		bra	grid_rot_done
 
 grid_rot_stdd:	move.b	(a1-grid_w),(a1)
 		move.b	(a1-grid_w*2),(a1-grid_w)
@@ -266,7 +266,7 @@ g_piy_inc:	addq.b	#1,grid_plr_y(a0)
 		move.l	grid_plr_a(a0),a1	; on row 2, so fill in next gem
 		subq.l	#grid_w,a1
 		move.b	grid_plr_g2(a0),(a1)
-		jmp	g_piy_done
+		bra	g_piy_done
 
 g_piy_row3:	move.l	grid_plr_a(a0),a1	; on row 3, fill in last gem
 		sub.l	#grid_w*2,a1
@@ -345,7 +345,12 @@ gps1test:	or.b	#grid_plr_f,d0
 		move.b	d0,grid_plr_g3(a1)	; if they're not on screen
 		
 		jsr	grid_next_3		; setup the next 3 gems
+		
+		move.l	screen_adr1,a0
 		jsr	grid_draw_next		; draw them... bad place?
+		
+		move.l	screen_adr2,a0
+		jsr	grid_draw_next
 	
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
@@ -411,7 +416,7 @@ gu_input_up:	btst	#0,d0
 		move.l	#0,d0
 		jsr	grid_plr_rot
 		move.l	(sp)+,d0
-		jmp	gu_input_fire
+		bra	gu_input_fire
 		
 gu_input_down:	btst	#1,d0
 		beq	gu_input_crot
@@ -419,7 +424,7 @@ gu_input_down:	btst	#1,d0
 		move.l	#1,d0
 		jsr	grid_plr_rot
 		move.l	(sp)+,d0
-		jmp	gu_input_fire		
+		bra	gu_input_fire		
 		
 gu_input_crot:	move.b	#0,grid_inpt_rot
 		
@@ -511,6 +516,11 @@ gu_loop:	moveq.l	#0,d3
 		
 		btst	#grid_plr_bit,d3	; and if they're not player
 		bne	gu_skip
+		
+instead of flagging as static let's maintain a static grid
+then a count of 2 can result in a flag to static and should 
+be able to indicate clears too
+		
 		or.b	#grid_static_f,(a0)	; gems then flag as static
 		bra	gu_skip
 		
@@ -744,8 +754,8 @@ grid_draw:	; draw gems to screen
 		move.l	a1,a4
 
 		move.l	screen_adr,a0		; clear player gems from
-		;move.l	grid_plr_prev+4,d0	; previous location
-		move.l	grid_plr_prev,d0	; (single buffer version)
+		move.l	grid_plr_prev+4,d0	; previous location
+		;move.l	grid_plr_prev,d0	; (single buffer version)
 		cmp.l	#0,d0
 		beq	dg_loop_init		
 		
@@ -764,7 +774,7 @@ grid_draw:	; draw gems to screen
 		
 
 dg_loop_init:	; update offset buffer (if double buffering)
-		; move.l	grid_plr_prev,grid_plr_prev+4
+		move.l	grid_plr_prev,grid_plr_prev+4
 		
 		; clear in case there are no more player gems
 		move.l	#0,grid_plr_prev
@@ -791,7 +801,6 @@ dg1:
 						; and then draw where they are
 		cmp.l	#1,grid_stable
 		beq	dg_clear_chk			
-
 		
 		suba.l	#scr_w*2*16,a0		; > 0 so do offset
 		move.l	d5,d6
@@ -819,17 +828,10 @@ dg_type:	and.b	#grid_type_mask,d4
 		cmp.b	#0,d4
 		beq	dg_clear
 
-		moveq.l	#0,d6
-		move.b	d4,d6
-
-		lsl	#2,d6	
-		movea.l	#dg_jump,a3
-		movea.l	0(a3,d6.l),a3
+		movea.l	#grid_spr_firsts,a3
+		movea.l	0(a3,d4.l*4),a3
 		jsr	(a3)
 		bra	dg_clear
-
-dg_jump:
-		dc.l	dummy,red0,yellow0,purple0,green0,blue0
 
 		
 
@@ -849,63 +851,14 @@ dg_match:	; gems have been matched to do animations
 		beq	dg_clear
 
 		and.b	#grid_type_mask,d4
+		;cmp.b	#0,d4
+		;beq	dg_clear
 
-		; REPLACE THIS MESS WITH A JUMP TABLE!
-
-dgm_red:	cmp.b	#1,d4
-		bne	dgm_yellow
-		move.l	#red_map,a3
+		movea.l	#grid_spr_maps,a3	; find the map to use
+		movea.l	0(a3,d4.l*4),a3
 		jsr	grid_draw_gem
-		bra	dg_clear
+		bra	dg_clear		
 		
-dgm_yellow:	cmp.b	#2,d4
-		bne	dgm_purple
-		move.l	#yellow_map,a3
-		jsr	grid_draw_gem
-		bra	dg_clear
-		
-dgm_purple:	cmp.b	#3,d4
-		bne	dgm_green
-		move.l	#purple_map,a3
-		jsr	grid_draw_gem
-		bra	dg_clear
-		
-dgm_green:	cmp.b	#4,d4
-		bne	dgm_blue
-		move.l	#green_map,a3
-		jsr	grid_draw_gem
-		bra	dg_clear
-				
-
-dgm_blue:	move.l	#blue_map,a3
-		jsr	grid_draw_gem
-		bra	dg_clear
-
-dg_white:	move.w	#$ffff,d1
-	
-dg_draw:	movea.l	a1,a0
-		
-		REPT	grid_s
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		move.w	d1,(a0)+
-		adda.l	#scr_w*2-grid_s*2,a0
-		ENDR		
-	
-		bra	dg_clear
 
 dg_bg:		move.l	a1,a0
 		jsr 	dg_drawbg
@@ -932,6 +885,7 @@ dg_next:
 		bgt	dg_done			; above to clip the player gems
 
 dg_brk:		move.l	screen_adr,a0
+		move.l	a0,a1
 		moveq.l	#0,d0
 		move.b	grid_plr_x(a2),d0	; x-pos
 		lsl.l	#5,d0			; * 16
@@ -946,14 +900,19 @@ dg_done:	movem.l	(sp)+,d0-d7/a0-a5
 
 
 
-dg_drawbg:	movem.l	d0/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
-						; offset based on a0-screen_adr
-		lea	background,a1
-		move.l	a0,d0
+dg_drawbg:	movem.l	d0-d1/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
+						; offset based on a0-a1
+		move.l	a0,d0			; where a1 = screen buffer to use
+		;sub.l	a1,d0
 		sub.l	screen_adr,d0
+		
+		lea	background,a1
 		adda.l	d0,a1
+		
+		move.l	#3,d1
 
-		REPT	grid_s
+dg_bg_loop:
+		REPT	grid_s/4
 
 		move.l	(a1)+,(a0)+
 		move.l	(a1)+,(a0)+
@@ -968,46 +927,83 @@ dg_drawbg:	movem.l	d0/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
 
 		ENDR
 		
-		movem.l	(sp)+,d0/a0-a1
+		dbf	d1,dg_bg_loop
+		
+		movem.l	(sp)+,d0-d1/a0-a1
 		rts
 
 
 
 
-grid_draw_next:	movem.l	d0-d2/a0-a3,-(sp)
+grid_clear:	movem.l	d0-d2/a0-a1,-(sp)	; draw the grid part of the bg
+
+		move.l	screen_adr,a0
+		lea	background,a1
 		
+		adda.l	#scr_w*grid_s*2,a0
+		adda.l	#scr_w*grid_s*2,a1
+		
+		move.l	#(scr_w-grid_s*grid_w)*2,d1
+		move.l	#grid_s*grid_h,d2
+		
+		adda.l	#grid_x*2,a0		; start of grid
+		adda.l	#grid_x*2,a1
+
+gc_loop:		
+		REPT 	grid_s*grid_w/2		; 96 bytes
+		;move.l	(a1)+,(a0)+
+		move.l	#$fabcfabc,(a0)+
+		ENDR
+		
+		adda.l	d1,a0
+		adda.l	d1,a1
+				
+		dbf	d2,gc_loop
+
+		movem.l	(sp)+,d0-d2/a0-a1
+		rts
+		
+
+
+
+grid_draw_next:	movem.l	d0-d2/a0-a4,-(sp)	; draws the next 3 gems into 
+						; the screen buffer at a0
+								
 		move.l	#scr_w*16*2,d2		; offset for each square
 		movea.l	screen_adr,a0
+		move.l	a0,a1			; copy screen buffer to a1
 		adda.l	#grid_next_pos,a0
 		move.l	a0,a3
 				
-		lea	grid_plr,a1
+		lea	grid_plr,a4
 		moveq.l	#0,d0
 		lea	grid_spr_firsts,a2	; map of sprites
 		
-		move.b	grid_plr_next+2(a1),d0	; find the right entry in the main
+		move.b	grid_plr_next+2(a4),d0	; find the right entry in the main
 		cmp.b	#0,d0
 		beq	gdn_done
 		
 		lsl	#2,d0			; index into sprite map
 		adda.l	d0,a2
 		move.l	(a2),a2			; draw bg then sprite!
-		jsr	dg_drawbg
+		jsr	dg_drawbg		
 		jsr	(a2)
+		
 		adda.l	d2,a3			; screen offset
 		move.l	a3,a0
 		
-		move.b	grid_plr_next+1(a1),d0	; get the next gem
+		move.b	grid_plr_next+1(a4),d0	; get the next gem
 		lsl	#2,d0			
 		lea	grid_spr_firsts,a2
 		adda.l	d0,a2
 		move.l	(a2),a2
 		jsr	dg_drawbg			
 		jsr	(a2)
+		
 		adda.l	d2,a3
 		move.l	a3,a0
 		
-		move.b	grid_plr_next(a1),d0	; and the last
+		move.b	grid_plr_next(a4),d0	; and the last
 		lsl	#2,d0		
 		lea	grid_spr_firsts,a2
 		adda.l	d0,a2
@@ -1016,7 +1012,7 @@ grid_draw_next:	movem.l	d0-d2/a0-a3,-(sp)
 		jsr	(a2)
 		
 				
-gdn_done:	movem.l	(sp)+,d0-d2/a0-a3
+gdn_done:	movem.l	(sp)+,d0-d2/a0-a4
 		rts
 			
 		
@@ -1043,7 +1039,7 @@ grid_spr_maps	dc.l	0,red_map,yellow_map,purple_map,green_map,blue_map
 grid_spr_firsts	dc.l	0,red0,yellow0,purple0,green0,blue0
 
 grid_i_speed	dc.l	1	; initial speed
-grid_i_delay	dc.l	4
+grid_i_delay	dc.l	1
 grid_x_speed	dc.b	4
 
 
@@ -1086,6 +1082,7 @@ grid_matched	ds.b	1
 
 grid_timer	ds.l	1
 grid		ds.b	grid_w*grid_h
+grid_state	ds.b	grid_w*grid_h
 grid_stable	ds.b	1
 
 	section	text

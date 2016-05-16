@@ -45,7 +45,7 @@ game_p_done:
 game_init:	movem.l	d0-a6,-(sp)
 	
 		jsr	bg_load_game
-		jsr	bg_draw
+		jsr	bg_draw_bb
 		
 		jsr	grid_init
 				
@@ -54,9 +54,13 @@ game_init:	movem.l	d0-a6,-(sp)
 		move.l	#0,p1_gameover
 		move.l	#1,p1_score_upd
 		
-		movea.l	screen_adr,a0
-		adda.l	#high_sc_pos,a0
+		movea.l	screen_adr1,a0		; high score into both
+		adda.l	#high_sc_pos,a0		; screen buffers
 		lea	p1_score_high_d,a1
+		jsr	font_bcd
+		
+		movea.l	screen_adr2,a0
+		adda.l	#high_sc_pos,a0
 		jsr	font_bcd
 		
 		
@@ -69,7 +73,8 @@ game_init:	movem.l	d0-a6,-(sp)
 
 
 
-game_loop:	jsr	grid_draw
+game_loop:	; jsr	grid_clear
+		jsr	grid_draw
 		
 		cmp.l	#0,p1_score_upd
 		beq	game_loop_upd
@@ -105,9 +110,14 @@ game_inc_scr:	movem.l	d0/a0-a1,-(sp)
 
 
 game_draw_scr:	movem.l	a0-a1,-(sp)
-		movea.l	screen_adr,a0
+		
+		movea.l	screen_adr1,a0
 		adda.l	#curr_sc_pos,a0
 		lea	p1_score_d,a1
+		jsr	font_bcd
+		
+		movea.l	screen_adr2,a0
+		adda.l	#curr_sc_pos,a0
 		jsr	font_bcd
 		
 		move.l	#0,p1_score_upd

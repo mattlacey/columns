@@ -88,15 +88,7 @@ mainloop:
 		beq.s	.done					;
 		endc
 
-		tst.l	vblsync					;vbl wait mode
-		bne.s	.always					;
-.firstonly:	tst.w	vblwait		
-								;wait for first vbl only
-		beq.s	.done					;
-		clr.w	vblwait					;
-		bra.s	.waitdone				;
-
-.always:	move.w	.var,d0					;wait for next vbl always
+		move.w	.var,d0					;wait for next vbl always
 		cmp.w	vblwait,d0				;
 		beq.s	.done					;
 
@@ -349,7 +341,7 @@ demo_parts:
 seq_menuinit:	dc.l	0,dummy,dummy,main_menu_init,1,1
 seq_menuloop:	dc.l	0,dummy,dummy,main_menu_loop,1,1
 seq_gameinit:	dc.l	0,dummy,dummy,game_init,1,1
-seq_gameloop:	dc.l	0,dummy,dummy,game_loop,1,1
+seq_gameloop:	dc.l	0,dummy,dummy,game_loop,2,1
 seq_gameover:	dc.l	0,dummy,dummy,game_over_loop,1,1
 
 		;exit demo
