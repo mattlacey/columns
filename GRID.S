@@ -28,7 +28,7 @@ grid_clr_f	equ	$10			; clear flag
 grid_fclr_f	equ	$20			; force clear - still draws a gem
 grid_clr_both	equ	$30
 grid_match_f	equ	$40			; mask for match flag
-grid_static_f	equ	$80			; for gems that haven't moved
+
 
 grid_fast_on	equ	$f
 grid_fast_off	equ	0						
@@ -39,7 +39,6 @@ grid_plr_bit	equ	3
 grid_clr_bit	equ	4
 grid_fclr_bit	equ	5
 grid_match_bit	equ	6
-grid_static_bit equ	7
 
 
 
@@ -350,12 +349,8 @@ gps1test:	or.b	#grid_plr_f,d0
 		
 		jsr	grid_next_3		; setup the next 3 gems
 		
-		move.l	screen_adr1,a0
-		jsr	grid_draw_next		; draw them... bad place?
+		move.b	#2,grid_st_next
 		
-		move.l	screen_adr2,a0
-		jsr	grid_draw_next
-	
 		move.l	#grid_fast_off,grid_fast	
 		move.b	#0,grid_stable
 		move.b	#0,grid_spawn
@@ -486,12 +481,10 @@ gu_init:	; pre-processing before the main update
 gu_init_loop:	btst	#grid_match_bit,(a0)	; check for match
 		beq	gu_init_clear		
 		move.b	#grid_clr_f,(a0)+	; found, set clear
-		;move.b	#2,(a5)+
 		dbf	d0,gu_init_loop
 		bra	gu_init_done
 		
 gu_init_clear:	and.b	#grid_typep_mask,(a0)+	; clear flags except for
-		;adda.l	#1,a5
 		dbf	d0,gu_init_loop		; player flag
 		bra	gu_init_done
 
@@ -553,7 +546,6 @@ gu_l1:		and.b	#grid_type_mask,d4	; type of above in d4
 		or.b	#grid_fclr_f,(a0)	; force clear before draw
 		move.b	#grid_clr_f,(a1)	; and set above to 0 with clear
 		move.b	#2,(a5-grid_w)		
-;s		move.b	#0,(a5)			; remove clear
 		move.b	#2,(a4)			; draw over two frames
 		
 gu_l2:		move.b	#0,grid_stable		; clear stable flag
@@ -577,19 +569,18 @@ gu_skip:
 		jsr	grid_matches		; check for matches
 		move.l	#0,grid_plr_y_off(a0)	; clear the player offset
 		
-		lea	grid,a0			; stable so clear static 
-		move.l	#grid_c-1,d0		; and player flags for
-						; player gems
+		lea	grid,a0			; now stable clear player 
+		lea	grid_st_draw,a4		; flags for player gems but
+		move.l	#grid_c-1,d0		; force draw so they're not cleared
+						
 gu_s_loop:	btst	#grid_plr_bit,(a0)
 		beq	gu_s_loop_s
 		
-;**************
-;**************
-;Clear static state here?
-
-		and.b	#$77,(a0)		
+		and.b	#grid_xp_mask,(a0)	; clear player flag
+		move.b	#2,(a4)			; force draw
 
 gu_s_loop_s:	addq.l	#1,a0
+		addq.l	#1,a4
 		dbf	d0,gu_s_loop
 		
 		
@@ -757,7 +748,12 @@ gc3_noop:	movem.l	(sp)+,d0/d6/a0-a2
 grid_draw:	; draw gems to screen
 		movem.l	d0-d7/a0-a5,-(sp)
 		
-		lea	grid_plr,a2
+		cmp.b	#0,grid_st_next		; draw the next 3 gems
+		beq	dg_skip_next
+		subq.b	#1,grid_st_next
+		jsr	grid_draw_next
+		
+dg_skip_next:	lea	grid_plr,a2
 		moveq.l	#0,d0
 		move.l	grid_plr_y_off(a2),d0
 		move.l	d0,d5			; keep the offset
@@ -872,8 +868,6 @@ dg_match:	; gems have been matched to do animations
 		beq	dg_clear
 
 		and.b	#grid_type_mask,d4
-		;cmp.b	#0,d4
-		;beq	dg_clear
 
 		movea.l	#grid_spr_maps,a3	; find the map to use
 		movea.l	0(a3,d4.l*4),a3
@@ -923,10 +917,9 @@ dg_done:	movem.l	(sp)+,d0-d7/a0-a5
 
 
 
-dg_drawbg:	movem.l	d0-d1/a0-a1,-(sp)		; draw 16x16 of bg at a0, using
-						; offset based on a0-a1
-		move.l	a0,d0			; where a1 = screen buffer to use
-		;sub.l	a1,d0
+dg_drawbg:	movem.l	d0-d1/a0-a1,-(sp)	; draw 16x16 of bg at a0, using
+						; offset based on a0-screen_adr
+		move.l	a0,d0			
 		sub.l	screen_adr,d0
 		
 		lea	background,a1
@@ -958,39 +951,7 @@ dg_bg_loop:
 
 
 
-grid_clear:	movem.l	d0-d2/a0-a1,-(sp)	; draw the grid part of the bg
-
-		move.l	screen_adr,a0
-		lea	background,a1
-		
-		adda.l	#scr_w*grid_s*2,a0
-		adda.l	#scr_w*grid_s*2,a1
-		
-		move.l	#(scr_w-grid_s*grid_w)*2,d1
-		move.l	#grid_s*grid_h,d2
-		
-		adda.l	#grid_x*2,a0		; start of grid
-		adda.l	#grid_x*2,a1
-
-gc_loop:		
-		REPT 	grid_s*grid_w/2		; 96 bytes
-		;move.l	(a1)+,(a0)+
-		move.l	#$fabcfabc,(a0)+
-		ENDR
-		
-		adda.l	d1,a0
-		adda.l	d1,a1
-				
-		dbf	d2,gc_loop
-
-		movem.l	(sp)+,d0-d2/a0-a1
-		rts
-		
-
-
-
-grid_draw_next:	movem.l	d0-d2/a0-a4,-(sp)	; draws the next 3 gems into 
-						; the screen buffer at a0
+grid_draw_next:	movem.l	d0-d2/a0-a4,-(sp)	; draws the next 3 gems 
 								
 		move.l	#scr_w*16*2,d2		; offset for each square
 		movea.l	screen_adr,a0
@@ -1062,7 +1023,7 @@ grid_spr_maps	dc.l	0,red_map,yellow_map,purple_map,green_map,blue_map
 grid_spr_firsts	dc.l	0,red0,yellow0,purple0,green0,blue0
 
 grid_i_speed	dc.l	1	; initial speed
-grid_i_delay	dc.l	1
+grid_i_delay	dc.l	4
 grid_x_speed	dc.b	4
 
 
@@ -1108,5 +1069,7 @@ grid		ds.b	grid_w*grid_h
 grid_st_draw	ds.b	grid_w*grid_h		; draw state
 grid_st_clear	ds.b	grid_w*grid_h		; clear state
 grid_stable	ds.b	1
+
+grid_st_next	ds.b	1			; next indicator state
 
 	section	text
