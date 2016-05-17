@@ -53,6 +53,7 @@ game_init:	movem.l	d0-a6,-(sp)
 		move.l	#0,p1_score_d
 		move.l	#0,p1_gameover
 		move.l	#1,p1_score_upd
+		move.l	#1,gameover_draw
 		
 		movea.l	screen_adr1,a0		; high score into both
 		adda.l	#high_sc_pos,a0		; screen buffers
@@ -128,6 +129,11 @@ game_draw_scr:	movem.l	a0-a1,-(sp)
 
 
 game_over_loop:	; game over so print text and do sweet fa
+
+		cmp.l	#1,gameover_draw
+		bne	game_ol_joy
+		
+		move.l	#0,gameover_draw
 		
 		movea.l	screen_adr,a0
 		adda.l	#bg_gameover_p,a0
@@ -139,7 +145,7 @@ game_over_loop:	; game over so print text and do sweet fa
 		lea	txt_gameover,a1
 		jsr	font_print
 				
-		jsr	joy_update					
+game_ol_joy:	jsr	joy_update					
 		moveq.l	#0,d0				; move on on fire
 		move.b	joy1fire,d0
 		or.b	joy2fire,d0
@@ -202,3 +208,4 @@ p1_score_high_d:ds.l	1
 p1_score_upd:	ds.l	1
 p1_gameover:	ds.l	1
 music_on:	ds.l	1
+gameover_draw:	ds.l	1
