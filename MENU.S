@@ -206,7 +206,7 @@ txt_mm_quit_l	equ	4
 mm_count	equ	3
 
 txt_credits	dc.b	'                                        TRIONOIDS BY @LACEYSNR.   GFX : MMACD / @LACEYSNR.   MUSIC : DROZERIX (MOD ARCHIVE ID 173935).   FRAMEWORK : DHS.    '
-txt_credits_2	dc.b	'   SPECIAL THANX : THADOS, GGN, DML, DEFJAM, WIETZE, CHRISTOS, RAGSTAFF AND #ATARISCNE.   GREETS TO MEMBERS OF MACE PAST & PRESENT.    ',0   
+txt_credits_2	dc.b	'   SPECIAL THANX : THADOS, GGN, DML (X1000), DEFJAM, WIETZE, CHRISTOS AND #ATARISCNE.   GREETS TO MEMBERS OF MACE PAST & PRESENT.    ',0   
 txt_credits_end
 
 mm_curr		ds.b	1
